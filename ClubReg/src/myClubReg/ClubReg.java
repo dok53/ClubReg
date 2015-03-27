@@ -443,7 +443,7 @@ public class ClubReg {
 				if (checker == JFileChooser.APPROVE_OPTION){
 					NamePath = chooser.getSelectedFile();
 					try{
-						//Move the file to wamp 
+						//Move the file to server 
 						File moveFile = new File (NamePath.getAbsolutePath());
 						filename = ("images/players/" + moveFile.getName());
 						if(moveFile.renameTo(new File("C:\\wamp\\www\\images\\players\\" + moveFile.getName()))){
@@ -833,7 +833,8 @@ public class ClubReg {
 		}
 		try {
 			//Initialize Connection and statements
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
 			insert = con.createStatement();
 			update = con.createStatement();
 			//Execute SQL statement
@@ -869,7 +870,8 @@ public class ClubReg {
 		PreparedStatement selectStatement = null;
 		try {
 			//Initialize Connection and statement
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
 			selectStatement = (PreparedStatement)con.prepareStatement("SELECT `TeamName`,`Team_ID` FROM `teams`");
 			//Store results in a result set
 			ResultSet result = selectStatement.executeQuery();
@@ -903,7 +905,8 @@ public class ClubReg {
 		PreparedStatement selectStatement = null;
 		try {
 			//Initialize Connection and statement
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
 			selectStatement = (PreparedStatement)con.prepareStatement("SELECT * FROM `manager`");
 			//Store results in a result set
 			ResultSet result = selectStatement.executeQuery();
@@ -939,7 +942,8 @@ public class ClubReg {
 		PreparedStatement selectStatement = null;
 		try {
 			//Initialize Connection and statement
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
 			selectStatement = (PreparedStatement)con.prepareStatement("SELECT * FROM `players`");
 			//Store results in a result set
 			ResultSet result = selectStatement.executeQuery();
