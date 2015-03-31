@@ -1,13 +1,13 @@
 /**
-* The ClubReg program allows for players to be registered, viewed
-* edited and deleted from an external database. It also allows access
-* to a chairman or any other officials at a club to keep up to date
-* on player history i.e. discipline, financial and performance statistics.
-*
-* @author  Derek O' Keeffe
-* @version 1.0
-* @since   14/03/2015 
-*/
+ * The ClubReg program allows for players to be registered, viewed
+ * edited and deleted from an external database. It also allows access
+ * to a chairman or any other officials at a club to keep up to date
+ * on player history i.e. discipline, financial and performance statistics.
+ *
+ * @author  Derek O' Keeffe
+ * @version 1.0
+ * @since   14/03/2015 
+ */
 package myClubReg;
 
 import java.awt.EventQueue;
@@ -158,12 +158,14 @@ public class ClubReg {
 	// Set up collections to hold information retrieved 
 	// from database on start up
 	private HashMap<String, Integer> teamAndId = new HashMap<String, Integer>();
-	//Fill manager array with manager objects
 	private ArrayList<Manager> managers = new ArrayList<Manager>();
-	//Do player array with player objects
 	private ArrayList<Player> players = new ArrayList<Player>();
+	private ArrayList<Official> officials = new ArrayList<Official>();
 	//Table model
 	final DefaultTableModel model = new DefaultTableModel(players.size(),columnNames.length);//change the 9 to the amount of players in a team
+	//Hold the managers team ID
+	private String managerTeamID;
+	private boolean found = false;
 
 	/**
 	 * Launch the application.
@@ -195,8 +197,8 @@ public class ClubReg {
 		fillManagers();
 		//Fill all players on start up
 		fillAllPlayers();
-		//Testing this method
-		addPlayersToTable();
+		//Fill all officials on start up
+		fillOfficials();
 		initialize();
 	}
 
@@ -225,7 +227,7 @@ public class ClubReg {
 		gbc_cards.gridy = 1;
 		frmClubreg.getContentPane().add(cards, gbc_cards);
 		cards.setLayout(new CardLayout(0, 0));
-		
+
 		//Set up the layout of the login panel
 		login = new JPanel();
 		login.setBackground(Color.WHITE);
@@ -264,8 +266,14 @@ public class ClubReg {
 		loginLogo.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				CardLayout cl = (CardLayout)(cards.getLayout());
-				cl.show(cards, RECEP);
+				/*if (userLoginField.getText().length() < 1 || passLoginField.getText().length() < 1){
+					JOptionPane.showMessageDialog(null,"Please enter all fields!.","Missing info",2);
+				}*/
+				managerLoginCheck();
+				officialLoginCheck();
+				if(!found){
+					JOptionPane.showMessageDialog(null, "Wrong Username or Password!! Please try again");
+				}
 			}
 		});
 		loginLogo.setIcon(new ImageIcon(ClubReg.class.getResource("/images/logo.png")));
@@ -508,7 +516,7 @@ public class ClubReg {
 		}
 		teamBox.setBounds(257, 578, 227, 22);
 		reception.add(teamBox);
-		
+
 		btnLogoutRecep = new JButton("Logout");
 		btnLogoutRecep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -578,7 +586,7 @@ public class ClubReg {
 		//select column_name from information_schema.columns where table_name='players'.... fill array with this info
 		//table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Job No");
 		//table.getColumnModel().getColumn(0).setPreferredWidth(55);
-		
+
 		for (int k = 0; k < 3; k++)
 		{
 			table.getTableHeader().getColumnModel().getColumn(k).setHeaderValue(columnNames[k]);
@@ -589,7 +597,7 @@ public class ClubReg {
 			table.getColumnModel().getColumn(x).setPreferredWidth(55);
 		}
 		scrollPane.setViewportView(table);
-		
+
 		btnLogoutManager = new JButton("Logout");
 		btnLogoutManager.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -599,43 +607,43 @@ public class ClubReg {
 		});
 		btnLogoutManager.setBounds(418, 615, 97, 25);
 		manager.add(btnLogoutManager);
-		
+
 		// Setup create team screen
 		createTeam = new JPanel();
 		createTeam.setBackground(Color.WHITE);
 		cards.add(createTeam, CREATE_TEAM);
 		createTeam.setLayout(null);
-		
+
 		createTeamHeader = new JLabel("");
 		createTeamHeader.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
 		createTeamHeader.setHorizontalAlignment(SwingConstants.CENTER);
 		createTeamHeader.setBounds(75, 0, 814, 98);
 		createTeam.add(createTeamHeader);
-		
+
 		lblCreateTeamName = new JLabel("Team Name");
 		lblCreateTeamName.setBounds(335, 194, 102, 16);
 		createTeam.add(lblCreateTeamName);
-		
+
 		JButton btnCreateTeam = new JButton("Create Team");
 		btnCreateTeam.setBounds(418, 260, 137, 25);
 		createTeam.add(btnCreateTeam);
-		
+
 		createTeamNameField = new JTextField();
 		createTeamNameField.setColumns(10);
 		createTeamNameField.setBounds(449, 191, 220, 22);
 		createTeam.add(createTeamNameField);
-		
+
 		createTeamMessage = new JLabel("Please note that teams must be added first and you will be redirected to a new window to add the a manager to the team");
 		createTeamMessage.setHorizontalAlignment(SwingConstants.CENTER);
 		createTeamMessage.setBounds(75, 298, 814, 33);
 		createTeam.add(createTeamMessage);
-		
+
 		lblTeamDetailsCreateTeam = new JLabel("Team Details");
 		lblTeamDetailsCreateTeam.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTeamDetailsCreateTeam.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblTeamDetailsCreateTeam.setBounds(75, 128, 814, 16);
 		createTeam.add(lblTeamDetailsCreateTeam);
-		
+
 		btnLogoutCreateTeam = new JButton("Logout");
 		btnLogoutCreateTeam.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -645,81 +653,81 @@ public class ClubReg {
 		});
 		btnLogoutCreateTeam.setBounds(418, 570, 137, 25);
 		createTeam.add(btnLogoutCreateTeam);
-		
+
 		// Setup new manager screen
 		addManager = new JPanel();
 		addManager.setBackground(Color.WHITE);
 		cards.add(addManager, ADD_MANAGER);
 		addManager.setLayout(null);
-		
+
 		JLabel addManagerHeader = new JLabel("");
 		addManagerHeader.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
 		addManagerHeader.setHorizontalAlignment(SwingConstants.CENTER);
 		addManagerHeader.setBounds(75, 0, 814, 98);
 		addManager.add(addManagerHeader);
-		
+
 		JLabel newManagerNameLbl = new JLabel("Name");
 		newManagerNameLbl.setBounds(260, 181, 119, 16);
 		addManager.add(newManagerNameLbl);
-		
+
 		JLabel newManagerSurnameLbl = new JLabel("Surname");
 		newManagerSurnameLbl.setBounds(260, 239, 119, 16);
 		addManager.add(newManagerSurnameLbl);
-		
+
 		JLabel newTeamNameLbl = new JLabel("Team name");
 		newTeamNameLbl.setBounds(260, 303, 119, 16);
 		addManager.add(newTeamNameLbl);
-		
+
 		JLabel newManagerUsernameLbl = new JLabel("Username");
 		newManagerUsernameLbl.setBounds(260, 363, 119, 16);
 		addManager.add(newManagerUsernameLbl);
-		
+
 		JLabel newManagerPasswordLbl = new JLabel("Password");
 		newManagerPasswordLbl.setBounds(260, 431, 119, 16);
 		addManager.add(newManagerPasswordLbl);
-		
+
 		newManagerName = new JTextField();
 		newManagerName.setBounds(433, 178, 237, 22);
 		addManager.add(newManagerName);
 		newManagerName.setColumns(10);
-		
+
 		newManagerSurname = new JTextField();
 		newManagerSurname.setBounds(433, 236, 237, 22);
 		addManager.add(newManagerSurname);
 		newManagerSurname.setColumns(10);
-		
+
 		newManagerTeamName = new JTextField();
 		newManagerTeamName.setBounds(433, 300, 237, 22);
 		addManager.add(newManagerTeamName);
 		newManagerTeamName.setColumns(10);
-		
+
 		newManagerUsername = new JTextField();
 		newManagerUsername.setBounds(433, 360, 237, 22);
 		addManager.add(newManagerUsername);
 		newManagerUsername.setColumns(10);
-		
+
 		newManagerPassword = new JPasswordField();
 		newManagerPassword.setBounds(433, 428, 237, 22);
 		addManager.add(newManagerPassword);
-		
+
 		managerDetailsLbl = new JLabel("Manager Details");
 		managerDetailsLbl.setFont(new Font("Tahoma", Font.BOLD, 15));
 		managerDetailsLbl.setHorizontalAlignment(SwingConstants.CENTER);
 		managerDetailsLbl.setBounds(75, 125, 814, 16);
 		addManager.add(managerDetailsLbl);
-		
+
 		newManagerTeamIDLbl = new JLabel("Team name/ID");
 		newManagerTeamIDLbl.setBounds(260, 500, 119, 16);
 		addManager.add(newManagerTeamIDLbl);
-		
+
 		newManagerTeamIDBox = new JComboBox<String>();
 		newManagerTeamIDBox.setBounds(433, 497, 237, 22);
 		addManager.add(newManagerTeamIDBox);
-		
+
 		JButton newManagerCreateBtn = new JButton("Create");
 		newManagerCreateBtn.setBounds(336, 549, 309, 25);
 		addManager.add(newManagerCreateBtn);
-		
+
 		JButton btnLogoutCreateManager = new JButton("Logout");
 		btnLogoutCreateManager.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -734,19 +742,19 @@ public class ClubReg {
 		chairman.setBackground(Color.WHITE);
 		cards.add(chairman, CHAIRMAN);
 		chairman.setLayout(null);
-		
+
 		JLabel chairmanHeader = new JLabel("");
 		chairmanHeader.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
 		chairmanHeader.setHorizontalAlignment(SwingConstants.CENTER);
 		chairmanHeader.setBounds(75, 0, 814, 98);
 		chairman.add(chairmanHeader);
-		
+
 		JLabel lblChairman = new JLabel("Chairman");
 		lblChairman.setHorizontalAlignment(SwingConstants.CENTER);
 		lblChairman.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblChairman.setBounds(75, 133, 814, 16);
 		chairman.add(lblChairman);
-		
+
 		JButton btnReceptionChairman = new JButton("Reception");
 		btnReceptionChairman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -756,7 +764,7 @@ public class ClubReg {
 		});
 		btnReceptionChairman.setBounds(164, 255, 277, 25);
 		chairman.add(btnReceptionChairman);
-		
+
 		JButton btnPlayersChairman = new JButton("Players");
 		btnPlayersChairman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -766,20 +774,20 @@ public class ClubReg {
 		});
 		btnPlayersChairman.setBounds(526, 255, 272, 25);
 		chairman.add(btnPlayersChairman);
-		
+
 		JButton btnTeamsChairman = new JButton("Teams");
 		btnTeamsChairman.setBounds(164, 322, 277, 25);
 		chairman.add(btnTeamsChairman);
-		
+
 		JButton btnManagersChairman = new JButton("Managers");
 		btnManagersChairman.setBounds(526, 322, 272, 25);
 		chairman.add(btnManagersChairman);
-		
+
 		JLabel lblPleaseSelectOne = new JLabel("Please select one of the options below to progress");
 		lblPleaseSelectOne.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPleaseSelectOne.setBounds(75, 195, 814, 16);
 		chairman.add(lblPleaseSelectOne);
-		
+
 		JButton btnLogoutChairman = new JButton("Logout");
 		btnLogoutChairman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -814,7 +822,7 @@ public class ClubReg {
 		//Create calendar date picker
 		SimpleDateFormat fmt = new java.text.SimpleDateFormat("dd/MM/yyyy");
 		String formattedDate = fmt.format(dateChooser.getDate());
-		//Declare parent name variables and team ID and name
+		//Declare parent name variables, team ID and name
 		String parentName;
 		String parentSurname;
 		int teamID = 0;
@@ -918,10 +926,44 @@ public class ClubReg {
 			{
 				Manager manager = new Manager(result.getString(2), result.getString(6), result.getString(5), result.getString(7));
 				managers.add(manager);
-				System.out.println(manager);
 			}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null,"Database unavailable cannot fill managers.","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//Close statement
+				selectStatement.close();
+			}catch(SQLException e){}
+			try{
+				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
+	/**
+	 * Method to fill ArrayList with all officials in database
+	 */
+	public void fillOfficials()
+	{
+		//Declare Connection and Prepared statement for SQL
+		Connection con = null;
+		PreparedStatement selectStatement = null;
+		try {
+			//Initialize Connection and statement
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			selectStatement = (PreparedStatement)con.prepareStatement("SELECT * FROM `officials`");
+			//Store results in a result set
+			ResultSet result = selectStatement.executeQuery();
+			while (result.next())
+			{
+				Official official = new Official(result.getString(2), result.getString(3), result.getString(4), result.getString(5), result.getString(6));
+				officials.add(official);
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null,"Database unavailable cannot fill officials.","Missing info",2);
 			e.printStackTrace();
 		}
 		finally{
@@ -952,13 +994,12 @@ public class ClubReg {
 			ResultSet result = selectStatement.executeQuery();
 			while (result.next())
 			{
-				//Populate array
+				//Populate player array
 				Player player = new Player(result.getInt(24), result.getString(2), result.getString(3), result.getString(4), result.getString(5), result.getString(6),
 						result.getString(7), result.getString(8),result.getString(9), result.getString(10), result.getString(11), result.getString(12),
 						result.getString(13), result.getString(14), result.getString(15), result.getString(16), result.getInt(17), result.getInt(18),
 						result.getInt(19), result.getInt(20), result.getInt(21), result.getInt(22), result.getString(23));
 				players.add(player);
-				System.out.println(player.toString());
 			}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null,"Database unavailable cannot fill all players.","Missing info",2);
@@ -976,18 +1017,19 @@ public class ClubReg {
 		}
 	}
 	/**
-	 * Adds all players to the table
-	 * This will be modified to accept a managers Name/ID to make it more efficient
+	 * Adds all players to the table depending on the Id of the manager logged in
+	 * @param id
 	 */
-	public void addPlayersToTable()
+	public void addPlayersToTable(int id)
 	{
 		model.setRowCount(0);
 		Connection con = null;
 		PreparedStatement selectStatement = null;
 		ResultSet result = null;
+		//int id = Integer.parseInt(managerTeamID);
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
-			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players`");
+			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players` WHERE `team_ID` = ('"+id+"')");
 			result = selectStatement.executeQuery();
 			int i = 0;
 			while (result.next()){
@@ -996,7 +1038,7 @@ public class ClubReg {
 				i ++;
 			}
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null,"Problem filling table.","Missing info",2);
+			JOptionPane.showMessageDialog(null,"Problem adding players to table.","Missing info",2);
 			e.printStackTrace();
 		}
 		finally{
@@ -1009,6 +1051,46 @@ public class ClubReg {
 			try{
 				con.close();
 			}catch(SQLException e){}
+		}
+	}
+	public void officialLoginCheck()
+	{
+		for (int i = 0; i < officials.size(); i ++)
+		{
+			if (userLoginField.getText().equalsIgnoreCase(officials.get(i).getUsername()))
+			{
+				if (passLoginField.getText().equalsIgnoreCase(officials.get(i).getPassword()))
+				{
+					found = true;
+					userLoginField.setText("");
+					passLoginField.setText("");
+					CardLayout cl = (CardLayout)(cards.getLayout());
+					cl.show(cards, CHAIRMAN);
+				}
+			}
+		}
+	}
+	/**
+	 * Check the login credentials of the managers
+	 */
+	public void managerLoginCheck()
+	{
+		for (int i = 0; i < managers.size(); i ++)
+		{
+			if (userLoginField.getText().equalsIgnoreCase(managers.get(i).getManagerUsername()))
+			{
+				if (passLoginField.getText().equalsIgnoreCase(managers.get(i).getmanagerPassword()))
+				{
+					found = true;
+					managerTeamID = managers.get(i).getManagerTeamID();
+					userLoginField.setText("");
+					passLoginField.setText("");
+					CardLayout cl = (CardLayout)(cards.getLayout());
+					cl.show(cards, MANAGER);
+					//Add appropriate players to table
+					addPlayersToTable(Integer.parseInt(managerTeamID));
+				}
+			}
 		}
 	}
 	/**
@@ -1030,6 +1112,34 @@ public class ClubReg {
 		dateChooser.setCalendar(null);
 		filePathFieldRecep.setText("");
 	}
-	
+
+	/**
+	 * @return the managerTeamID
+	 */
+	public String getManagerTeamID() {
+		return managerTeamID;
+	}
+
+	/**
+	 * @param managerTeamID the managerTeamID to set
+	 */
+	public void setManagerTeamID(String managerTeamID) {
+		this.managerTeamID = managerTeamID;
+	}
+
+	/**
+	 * @return the found
+	 */
+	public boolean isFound() {
+		return found;
+	}
+
+	/**
+	 * @param found the found to set
+	 */
+	public void setFound(boolean found) {
+		this.found = found;
+	}
+
 }
 
