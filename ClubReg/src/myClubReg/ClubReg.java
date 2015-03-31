@@ -80,7 +80,6 @@ public class ClubReg {
 	private JLabel passLogin;
 	private JLabel loginLogo;
 	private JTextField userLoginField;
-	private JTextField passLoginField;
 	//receptionist
 	private JPanel reception;
 	private JLabel recepHeader;
@@ -134,7 +133,6 @@ public class ClubReg {
 	final private String ADD_MANAGER = "Add manager panel";
 	final private String CHAIRMAN = "Chairman panel";
 	private JLabel lblAllPlayers;
-	private JButton btnManager;
 	//Create team
 	private JPanel createTeam;
 	private JLabel lblTeamDetailsCreateTeam;
@@ -166,6 +164,8 @@ public class ClubReg {
 	//Hold the managers team ID
 	private String managerTeamID;
 	private boolean found = false;
+	private JPasswordField passLoginField;
+	private JButton btnBackCreateTeam;
 
 	/**
 	 * Launch the application.
@@ -251,11 +251,6 @@ public class ClubReg {
 		userLoginField.setBounds(464, 252, 116, 22);
 		login.add(userLoginField);
 
-		passLoginField = new JTextField();
-		passLoginField.setColumns(10);
-		passLoginField.setBounds(464, 287, 116, 22);
-		login.add(passLoginField);
-
 		passLogin = new JLabel("password");
 		passLogin.setHorizontalAlignment(SwingConstants.CENTER);
 		passLogin.setFont(new Font("Trajan Pro", Font.BOLD, 13));
@@ -272,7 +267,7 @@ public class ClubReg {
 				managerLoginCheck();
 				officialLoginCheck();
 				if(!found){
-					JOptionPane.showMessageDialog(null, "Wrong Username or Password!! Please try again");
+					JOptionPane.showMessageDialog(null, "User not found!! Please try again");
 				}
 			}
 		});
@@ -280,6 +275,10 @@ public class ClubReg {
 		loginLogo.setHorizontalAlignment(SwingConstants.CENTER);
 		loginLogo.setBounds(406, 340, 116, 104);
 		login.add(loginLogo);
+		
+		passLoginField = new JPasswordField();
+		passLoginField.setBounds(464, 287, 116, 22);
+		login.add(passLoginField);
 
 		//Setup the reception screen
 		reception = new JPanel();
@@ -498,16 +497,6 @@ public class ClubReg {
 		btnSavePlayersRecord.setBounds(523, 578, 233, 25);
 		reception.add(btnSavePlayersRecord);
 
-		btnManager = new JButton("Manager");
-		btnManager.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				CardLayout cl = (CardLayout)(cards.getLayout());
-				cl.show(cards, MANAGER);
-			}
-		});
-		btnManager.setBounds(26, 487, 97, 25);
-		reception.add(btnManager);
-
 		teamBox = new JComboBox<String>();
 		teamBox.addItem("Team");
 		for (Entry<String, Integer> entry : teamAndId.entrySet())
@@ -580,7 +569,18 @@ public class ClubReg {
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(75, 286, 814, 312);
 		manager.add(scrollPane, BorderLayout.CENTER);
-		table = new JTable(model);
+		table = new JTable(model)
+		{
+			/**
+			 * Set up table model
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int data, int columns)
+			{
+				return false;
+			}
+		};
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		//Get column names SQL
 		//select column_name from information_schema.columns where table_name='players'.... fill array with this info
@@ -625,7 +625,12 @@ public class ClubReg {
 		createTeam.add(lblCreateTeamName);
 
 		JButton btnCreateTeam = new JButton("Create Team");
-		btnCreateTeam.setBounds(418, 260, 137, 25);
+		btnCreateTeam.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addTeam();
+			}
+		});
+		btnCreateTeam.setBounds(335, 260, 137, 25);
 		createTeam.add(btnCreateTeam);
 
 		createTeamNameField = new JTextField();
@@ -653,6 +658,16 @@ public class ClubReg {
 		});
 		btnLogoutCreateTeam.setBounds(418, 570, 137, 25);
 		createTeam.add(btnLogoutCreateTeam);
+		
+		btnBackCreateTeam = new JButton("Back");
+		btnBackCreateTeam.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, CHAIRMAN);
+			}
+		});
+		btnBackCreateTeam.setBounds(532, 260, 137, 25);
+		createTeam.add(btnBackCreateTeam);
 
 		// Setup new manager screen
 		addManager = new JPanel();
@@ -795,8 +810,18 @@ public class ClubReg {
 				cl.show(cards, LOGIN);
 			}
 		});
-		btnLogoutChairman.setBounds(348, 426, 277, 25);
+		btnLogoutChairman.setBounds(521, 385, 277, 25);
 		chairman.add(btnLogoutChairman);
+		
+		JButton btnCreateTeamChairman = new JButton("Create Team");
+		btnCreateTeamChairman.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, CREATE_TEAM);
+			}
+		});
+		btnCreateTeamChairman.setBounds(164, 385, 277, 25);
+		chairman.add(btnCreateTeamChairman);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
@@ -1053,19 +1078,35 @@ public class ClubReg {
 			}catch(SQLException e){}
 		}
 	}
+	/**
+	 * Check the login credentials of the officials
+	 */
 	public void officialLoginCheck()
 	{
 		for (int i = 0; i < officials.size(); i ++)
 		{
 			if (userLoginField.getText().equalsIgnoreCase(officials.get(i).getUsername()))
 			{
-				if (passLoginField.getText().equalsIgnoreCase(officials.get(i).getPassword()))
+				String password = new String(passLoginField.getPassword());
+				if (password.equalsIgnoreCase(officials.get(i).getPassword()))
 				{
 					found = true;
 					userLoginField.setText("");
 					passLoginField.setText("");
-					CardLayout cl = (CardLayout)(cards.getLayout());
-					cl.show(cards, CHAIRMAN);
+					String position = officials.get(i).getPosition();
+					//Switch statement to show the correct screen to officials
+					switch (position){
+					case "Chairman":
+						CardLayout cl = (CardLayout)(cards.getLayout());
+						cl.show(cards, CHAIRMAN);
+						break;
+					case "Secretary":
+						CardLayout cl1 = (CardLayout)(cards.getLayout());
+						cl1.show(cards, RECEP);
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}
@@ -1079,7 +1120,8 @@ public class ClubReg {
 		{
 			if (userLoginField.getText().equalsIgnoreCase(managers.get(i).getManagerUsername()))
 			{
-				if (passLoginField.getText().equalsIgnoreCase(managers.get(i).getmanagerPassword()))
+				String password = new String(passLoginField.getPassword());
+				if (password.equalsIgnoreCase(managers.get(i).getmanagerPassword()))
 				{
 					found = true;
 					managerTeamID = managers.get(i).getManagerTeamID();
@@ -1092,6 +1134,42 @@ public class ClubReg {
 				}
 			}
 		}
+	}
+	public void addTeam()
+	{
+		//Initalize connection and statements
+				Connection con = null;
+				Statement insert = null;
+				Statement update = null;
+				try {
+					//Initialize Connection and statements
+					//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+					con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+					insert = con.createStatement();
+					update = con.createStatement();
+					String team = createTeamNameField.getText();
+					String sql = "INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`) VALUES (NULL, ('"+team+"'))";
+					//Execute SQL statement
+					//update.executeUpdate("INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`)"
+						//	+ " VALUES (NULL, ('"+createTeamNameField.getText()+"')");
+					update.executeUpdate(sql);
+					JOptionPane.showMessageDialog(null,"Team created. " + "Team name = " + team,"Missing info",2);
+					createTeamNameField.setText("");
+				} catch (SQLException e) {
+					//Show warning message
+					JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add team","Missing info",2);
+					e.printStackTrace();
+				}
+				finally{
+					try{
+						//Close statement
+						insert.close();
+					}catch(SQLException e){}
+					try{
+						//Close connection
+						con.close();
+					}catch(SQLException e){}
+				}
 	}
 	/**
 	 * Method to clear all fields on receptionist screen
@@ -1140,6 +1218,5 @@ public class ClubReg {
 	public void setFound(boolean found) {
 		this.found = found;
 	}
-
 }
 
