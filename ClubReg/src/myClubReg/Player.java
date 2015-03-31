@@ -1,10 +1,9 @@
-/**
- * 
- */
 package myClubReg;
 
 /**
- * @author DOK
+ * @author Derek O Keeffe
+ * @version 1.0
+ * Class to create player at the club
  *
  */
 public class Player {
@@ -31,7 +30,32 @@ public class Player {
 	private int goals;
 	private int cleanSheets;
 	private String pathToImage;
-	
+	/**
+	 * Class constructor
+	 * @param teamID
+	 * @param firstName
+	 * @param surname
+	 * @param status
+	 * @param houseNumber
+	 * @param dob
+	 * @param street
+	 * @param email
+	 * @param townCity
+	 * @param phoneNumber
+	 * @param county
+	 * @param lastClub
+	 * @param lastLeague
+	 * @param parentFirstName
+	 * @param parentSurname
+	 * @param dateOfReg
+	 * @param feesPaid
+	 * @param yellowCards
+	 * @param redCards
+	 * @param trainingAttended
+	 * @param goals
+	 * @param cleanSheets
+	 * @param pathToImage
+	 */
 	public Player(int teamID,String firstName, String surname, String status, String houseNumber, String dob, String street,
 			String email, String townCity, String phoneNumber, String county, String lastClub, String lastLeague,
 			String parentFirstName, String parentSurname, String dateOfReg, int feesPaid, int yellowCards, int redCards,
@@ -384,6 +408,25 @@ public class Player {
 	 */
 	public void setTeamID(int teamID) {
 		this.teamID = teamID;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Player [teamID=" + teamID + ", firstName=" + firstName
+				+ ", surname=" + surname + ", status=" + status
+				+ ", houseNumber=" + houseNumber + ", dob=" + dob + ", street="
+				+ street + ", email=" + email + ", townCity=" + townCity
+				+ ", phoneNumber=" + phoneNumber + ", county=" + county
+				+ ", lastClub=" + lastClub + ", lastLeague=" + lastLeague
+				+ ", parentFirstName=" + parentFirstName + ", parentSurname="
+				+ parentSurname + ", dateOfReg=" + dateOfReg + ", feesPaid="
+				+ feesPaid + ", yellowCards=" + yellowCards + ", redCards="
+				+ redCards + ", trainingAttended=" + trainingAttended
+				+ ", goals=" + goals + ", cleanSheets=" + cleanSheets
+				+ ", pathToImage=" + pathToImage + "]";
 	}
 
 }

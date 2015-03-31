@@ -69,8 +69,6 @@ public class ClubReg {
 	// Array lists with club products
 	String [] gear = {"Shorts", "Socks"};
 	String [] columnNames = {"First name", "Surname", "Phone number", "Fees paid", "YC", "RC","Training", "Goals", "CS"};
-	//Table model
-	final DefaultTableModel model = new DefaultTableModel(9,columnNames.length);//change the 9 to the amount of players in a team
 	//Create frame to hold cards
 	private JFrame frmClubreg;
 	//Cards
@@ -160,8 +158,12 @@ public class ClubReg {
 	// Set up collections to hold information retrieved 
 	// from database on start up
 	private HashMap<String, Integer> teamAndId = new HashMap<String, Integer>();
-	private ArrayList<String> managers= new ArrayList<String>();
-	private ArrayList<String> players= new ArrayList<String>();
+	//Fill manager array with manager objects
+	private ArrayList<Manager> managers = new ArrayList<Manager>();
+	//Do player array with player objects
+	private ArrayList<Player> players = new ArrayList<Player>();
+	//Table model
+	final DefaultTableModel model = new DefaultTableModel(players.size(),columnNames.length);//change the 9 to the amount of players in a team
 
 	/**
 	 * Launch the application.
@@ -193,6 +195,8 @@ public class ClubReg {
 		fillManagers();
 		//Fill all players on start up
 		fillAllPlayers();
+		//Testing this method
+		addPlayersToTable();
 		initialize();
 	}
 
@@ -912,10 +916,9 @@ public class ClubReg {
 			ResultSet result = selectStatement.executeQuery();
 			while (result.next())
 			{
-				//Populate array
-				managers.add(result.getString(2) + " " + result.getString(3) + " " + result.getString(4) +
-						" " + result.getString(5) + " " + result.getString(6));
-				System.out.println(managers.get(0));
+				Manager manager = new Manager(result.getString(2), result.getString(6), result.getString(5), result.getString(7));
+				managers.add(manager);
+				System.out.println(manager);
 			}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null,"Database unavailable cannot fill managers.","Missing info",2);
@@ -933,7 +936,7 @@ public class ClubReg {
 		}
 	}
 	/**
-	 * Method to fill ArrayList with all managers in database
+	 * Method to fill ArrayList with all players in database
 	 */
 	public void fillAllPlayers()
 	{
@@ -950,8 +953,12 @@ public class ClubReg {
 			while (result.next())
 			{
 				//Populate array
-				players.add(result.getString(2) + " " + result.getString(3) + " " + result.getString(4) +
-						" " + result.getString(5) + " " + result.getString(6));
+				Player player = new Player(result.getInt(24), result.getString(2), result.getString(3), result.getString(4), result.getString(5), result.getString(6),
+						result.getString(7), result.getString(8),result.getString(9), result.getString(10), result.getString(11), result.getString(12),
+						result.getString(13), result.getString(14), result.getString(15), result.getString(16), result.getInt(17), result.getInt(18),
+						result.getInt(19), result.getInt(20), result.getInt(21), result.getInt(22), result.getString(23));
+				players.add(player);
+				System.out.println(player.toString());
 			}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null,"Database unavailable cannot fill all players.","Missing info",2);
@@ -964,6 +971,42 @@ public class ClubReg {
 			}catch(SQLException e){}
 			try{
 				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
+	/**
+	 * Adds all players to the table
+	 * This will be modified to accept a managers Name/ID to make it more efficient
+	 */
+	public void addPlayersToTable()
+	{
+		model.setRowCount(0);
+		Connection con = null;
+		PreparedStatement selectStatement = null;
+		ResultSet result = null;
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players`");
+			result = selectStatement.executeQuery();
+			int i = 0;
+			while (result.next()){
+				model.insertRow(i,new Object[]{result.getString(2),(result.getString(3)),(result.getString(10)),(result.getString(17)), ((result.getString(18))),
+						((result.getString(19))),((result.getString(20))),result.getString(21),result.getString(22)});
+				i ++;
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null,"Problem filling table.","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				result.close();
+			}catch(SQLException e){}
+			try{
+				selectStatement.close();
+			}catch(SQLException e){}
+			try{
 				con.close();
 			}catch(SQLException e){}
 		}
