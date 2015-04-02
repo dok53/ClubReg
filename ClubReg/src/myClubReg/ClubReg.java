@@ -189,8 +189,9 @@ public class ClubReg {
 
 	/**
 	 * Create the application.
+	 * @throws Exception 
 	 */
-	public ClubReg() {
+	public ClubReg() throws Exception {
 		//Fill teams on start up
 		fillTeams();
 		//Fill managers on start up
@@ -199,6 +200,28 @@ public class ClubReg {
 		fillAllPlayers();
 		//Fill all officials on start up
 		fillOfficials();
+		
+		//Encrypt and Decrypt data
+		String password = "derek";
+        /*String passwordEnc = AES.encrypt(password);
+        String passwordDec = AES.decrypt(passwordEnc);
+        System.out.println((passwordEnc + " " + passwordDec));*/
+		
+		
+		//Store only the hash of the password when created
+		//when the user enters their password to login, create the hash again 
+		//then check if both hash's match and grant access depending on the case
+		String passHash = PasswordHash.createHash(password);
+		System.out.println("Password " + password + " passHash " + passHash);
+		if(PasswordHash.validatePassword(password, passHash))
+		{
+			System.out.println("Entry Granted");
+		}
+		if(!PasswordHash.validatePassword(password, passHash))
+		{
+			System.out.println("Entry Not Granted");
+		}
+        //init
 		initialize();
 	}
 
@@ -1135,6 +1158,9 @@ public class ClubReg {
 			}
 		}
 	}
+	/**
+	 * Add team to the database
+	 */
 	public void addTeam()
 	{
 		//Initalize connection and statements
@@ -1190,7 +1216,6 @@ public class ClubReg {
 		dateChooser.setCalendar(null);
 		filePathFieldRecep.setText("");
 	}
-
 	/**
 	 * @return the managerTeamID
 	 */
