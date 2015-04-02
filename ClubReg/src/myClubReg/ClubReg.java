@@ -44,6 +44,8 @@ import com.toedter.calendar.JDateChooser;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -132,6 +134,7 @@ public class ClubReg {
 	final private String CREATE_TEAM = "Create team panel";
 	final private String ADD_MANAGER = "Add manager panel";
 	final private String CHAIRMAN = "Chairman panel";
+	final private String ADMIN = "Admin panel";
 	private JLabel lblAllPlayers;
 	//Create team
 	private JPanel createTeam;
@@ -166,6 +169,14 @@ public class ClubReg {
 	private boolean found = false;
 	private JPasswordField passLoginField;
 	private JButton btnBackCreateTeam;
+	private JPanel admin;
+	private JTextField chairpersonNameField;
+	private JTextField chairpersonSurnameField;
+	private JTextField chairpersonPasswordField;
+	private JTextField chairpersonUsernameField;
+	private JLabel lblPosition;
+	private JTextField chairpersonPositionField;
+	private JButton btnCreateManager;
 
 	/**
 	 * Launch the application.
@@ -200,14 +211,14 @@ public class ClubReg {
 		fillAllPlayers();
 		//Fill all officials on start up
 		fillOfficials();
-		
+
 		//Encrypt and Decrypt data
 		String password = "derek";
-        /*String passwordEnc = AES.encrypt(password);
+		/*String passwordEnc = AES.encrypt(password);
         String passwordDec = AES.decrypt(passwordEnc);
         System.out.println((passwordEnc + " " + passwordDec));*/
-		
-		
+
+
 		//Store only the hash of the password when created
 		//when the user enters their password to login, create the hash again 
 		//then check if both hash's match and grant access depending on the case
@@ -221,7 +232,7 @@ public class ClubReg {
 		{
 			System.out.println("Entry Not Granted");
 		}
-        //init
+		//init
 		initialize();
 	}
 
@@ -281,16 +292,36 @@ public class ClubReg {
 		login.add(passLogin);
 
 		loginLogo = new JLabel("");
+		//Login checks on mouseListener
 		loginLogo.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				/*if (userLoginField.getText().length() < 1 || passLoginField.getText().length() < 1){
-					JOptionPane.showMessageDialog(null,"Please enter all fields!.","Missing info",2);
-				}*/
-				managerLoginCheck();
-				officialLoginCheck();
-				if(!found){
-					JOptionPane.showMessageDialog(null, "User not found!! Please try again");
+				//Check if admin has logged in
+				if (userLoginField.getText().equalsIgnoreCase("admin")){
+					String password = new String(passLoginField.getPassword());
+					if(password.equalsIgnoreCase("clubregadmin")){
+						CardLayout cl = (CardLayout)(cards.getLayout());
+						cl.show(cards, ADMIN);
+						userLoginField.setText("");
+						passLoginField.setText("");
+					}
+				}
+				// if not admin, loop through managers and officials
+				else if (!userLoginField.getText().equalsIgnoreCase("admin")){
+					try {
+						managerLoginCheck();
+						officialLoginCheck();
+					} catch (NoSuchAlgorithmException e1) {
+						JOptionPane.showMessageDialog(null, "Cannot login (loginInCheck mouseClicked)");
+						e1.printStackTrace();
+					} catch (InvalidKeySpecException e1) {
+						JOptionPane.showMessageDialog(null, "Cannot login (loginInCheck mouseClicked)");
+						e1.printStackTrace();
+					}
+					//if no matches
+					if(!found){
+						JOptionPane.showMessageDialog(null, "User not found!! Please try again");
+					}
 				}
 			}
 		});
@@ -298,7 +329,7 @@ public class ClubReg {
 		loginLogo.setHorizontalAlignment(SwingConstants.CENTER);
 		loginLogo.setBounds(406, 340, 116, 104);
 		login.add(loginLogo);
-		
+
 		passLoginField = new JPasswordField();
 		passLoginField.setBounds(464, 287, 116, 22);
 		login.add(passLoginField);
@@ -466,6 +497,7 @@ public class ClubReg {
 		reception.add(dateChooser);
 
 		btnUploadImage = new JButton("Choose file");
+		//Upload image actionListener
 		btnUploadImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
@@ -592,6 +624,7 @@ public class ClubReg {
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(75, 286, 814, 312);
 		manager.add(scrollPane, BorderLayout.CENTER);
+		//All table operations for manager screen
 		table = new JTable(model)
 		{
 			/**
@@ -681,7 +714,7 @@ public class ClubReg {
 		});
 		btnLogoutCreateTeam.setBounds(418, 570, 137, 25);
 		createTeam.add(btnLogoutCreateTeam);
-		
+
 		btnBackCreateTeam = new JButton("Back");
 		btnBackCreateTeam.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -759,6 +792,11 @@ public class ClubReg {
 		addManager.add(newManagerTeamIDLbl);
 
 		newManagerTeamIDBox = new JComboBox<String>();
+		newManagerTeamIDBox.addItem("Team");
+		for (Entry<String, Integer> entry : teamAndId.entrySet())
+		{
+			newManagerTeamIDBox.addItem(entry.getKey());
+		}
 		newManagerTeamIDBox.setBounds(433, 497, 237, 22);
 		addManager.add(newManagerTeamIDBox);
 
@@ -833,9 +871,9 @@ public class ClubReg {
 				cl.show(cards, LOGIN);
 			}
 		});
-		btnLogoutChairman.setBounds(521, 385, 277, 25);
+		btnLogoutChairman.setBounds(338, 607, 277, 25);
 		chairman.add(btnLogoutChairman);
-		
+
 		JButton btnCreateTeamChairman = new JButton("Create Team");
 		btnCreateTeamChairman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -845,6 +883,108 @@ public class ClubReg {
 		});
 		btnCreateTeamChairman.setBounds(164, 385, 277, 25);
 		chairman.add(btnCreateTeamChairman);
+		
+		btnCreateManager = new JButton("Create Manager");
+		btnCreateManager.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, ADD_MANAGER);
+			}
+		});
+		btnCreateManager.setBounds(526, 385, 272, 25);
+		chairman.add(btnCreateManager);
+		//Setup Admin panel
+		admin = new JPanel();
+		admin.setBackground(Color.WHITE);
+		cards.add(admin, ADMIN);
+		admin.setLayout(null);
+
+		JLabel adminHeader = new JLabel("");
+		adminHeader.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
+		adminHeader.setHorizontalAlignment(SwingConstants.CENTER);
+		adminHeader.setBounds(75, 0, 814, 98);
+		admin.add(adminHeader);
+
+		JLabel lblAdmin = new JLabel("Admin");
+		lblAdmin.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAdmin.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblAdmin.setBounds(75, 136, 814, 16);
+		admin.add(lblAdmin);
+
+		JLabel lblChairpersonName = new JLabel("Name");
+		lblChairpersonName.setBounds(310, 269, 157, 16);
+		admin.add(lblChairpersonName);
+
+		chairpersonNameField = new JTextField();
+		chairpersonNameField.setBounds(514, 266, 188, 22);
+		admin.add(chairpersonNameField);
+		chairpersonNameField.setColumns(10);
+
+		JLabel lblChairpersonSurname = new JLabel("Surname");
+		lblChairpersonSurname.setBounds(310, 318, 157, 16);
+		admin.add(lblChairpersonSurname);
+
+		chairpersonSurnameField = new JTextField();
+		chairpersonSurnameField.setBounds(514, 315, 188, 22);
+		admin.add(chairpersonSurnameField);
+		chairpersonSurnameField.setColumns(10);
+
+		JLabel lblPassword = new JLabel("Password");
+		lblPassword.setBounds(310, 412, 157, 16);
+		admin.add(lblPassword);
+
+		chairpersonPasswordField = new JTextField();
+		chairpersonPasswordField.setBounds(514, 409, 188, 22);
+		admin.add(chairpersonPasswordField);
+		chairpersonPasswordField.setColumns(10);
+
+		JLabel lblUsername = new JLabel("Username");
+		lblUsername.setBounds(310, 365, 157, 16);
+		admin.add(lblUsername);
+
+		chairpersonUsernameField = new JTextField();
+		chairpersonUsernameField.setBounds(514, 362, 188, 22);
+		admin.add(chairpersonUsernameField);
+		chairpersonUsernameField.setColumns(10);
+
+		JButton btnChairpersonCreate = new JButton("Create");
+		btnChairpersonCreate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					addChairperson();
+				} catch (NoSuchAlgorithmException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot add chairperson (action performed exception)");
+					e1.printStackTrace();
+				} catch (InvalidKeySpecException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot add chairperson (action performed exception)");
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnChairpersonCreate.setBounds(425, 463, 97, 25);
+		admin.add(btnChairpersonCreate);
+
+		JButton btnChairpersonLogout = new JButton("Logout");
+		btnChairpersonLogout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, LOGIN);
+			}
+		});
+		btnChairpersonLogout.setBounds(425, 599, 97, 25);
+		admin.add(btnChairpersonLogout);
+		
+		lblPosition = new JLabel("Position");
+		lblPosition.setBounds(310, 220, 157, 16);
+		admin.add(lblPosition);
+		
+		chairpersonPositionField = new JTextField();
+		chairpersonPositionField.setEditable(false);
+		chairpersonPositionField.setHorizontalAlignment(SwingConstants.CENTER);
+		chairpersonPositionField.setText("Chairperson");
+		chairpersonPositionField.setBounds(514, 217, 188, 22);
+		admin.add(chairpersonPositionField);
+		chairpersonPositionField.setColumns(10);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
@@ -1103,15 +1243,18 @@ public class ClubReg {
 	}
 	/**
 	 * Check the login credentials of the officials
+	 * @throws InvalidKeySpecException 
+	 * @throws NoSuchAlgorithmException 
 	 */
-	public void officialLoginCheck()
+	public void officialLoginCheck() throws NoSuchAlgorithmException, InvalidKeySpecException
 	{
 		for (int i = 0; i < officials.size(); i ++)
 		{
 			if (userLoginField.getText().equalsIgnoreCase(officials.get(i).getUsername()))
 			{
 				String password = new String(passLoginField.getPassword());
-				if (password.equalsIgnoreCase(officials.get(i).getPassword()))
+				String passHash = officials.get(i).getPassword();
+				if(PasswordHash.validatePassword(password, passHash))
 				{
 					found = true;
 					userLoginField.setText("");
@@ -1119,7 +1262,7 @@ public class ClubReg {
 					String position = officials.get(i).getPosition();
 					//Switch statement to show the correct screen to officials
 					switch (position){
-					case "Chairman":
+					case "Chairperson":
 						CardLayout cl = (CardLayout)(cards.getLayout());
 						cl.show(cards, CHAIRMAN);
 						break;
@@ -1164,38 +1307,86 @@ public class ClubReg {
 	public void addTeam()
 	{
 		//Initalize connection and statements
-				Connection con = null;
-				Statement insert = null;
-				Statement update = null;
-				try {
-					//Initialize Connection and statements
-					//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
-					con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
-					insert = con.createStatement();
-					update = con.createStatement();
-					String team = createTeamNameField.getText();
-					String sql = "INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`) VALUES (NULL, ('"+team+"'))";
-					//Execute SQL statement
-					//update.executeUpdate("INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`)"
-						//	+ " VALUES (NULL, ('"+createTeamNameField.getText()+"')");
-					update.executeUpdate(sql);
-					JOptionPane.showMessageDialog(null,"Team created. " + "Team name = " + team,"Missing info",2);
-					createTeamNameField.setText("");
-				} catch (SQLException e) {
-					//Show warning message
-					JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add team","Missing info",2);
-					e.printStackTrace();
-				}
-				finally{
-					try{
-						//Close statement
-						insert.close();
-					}catch(SQLException e){}
-					try{
-						//Close connection
-						con.close();
-					}catch(SQLException e){}
-				}
+		Connection con = null;
+		Statement insert = null;
+		Statement update = null;
+		try {
+			//Initialize Connection and statements
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			insert = con.createStatement();
+			update = con.createStatement();
+			String team = createTeamNameField.getText();
+			String sql = "INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`) VALUES (NULL, ('"+team+"'))";
+			//Execute SQL statement
+			//update.executeUpdate("INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`)"
+			//	+ " VALUES (NULL, ('"+createTeamNameField.getText()+"')");
+			update.executeUpdate(sql);
+			JOptionPane.showMessageDialog(null,"Team created. " + "Team name = " + team,"Missing info",2);
+			createTeamNameField.setText("");
+		} catch (SQLException e) {
+			//Show warning message
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add team","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//Close statement
+				insert.close();
+			}catch(SQLException e){}
+			try{
+				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
+	/**
+	 * Add chairperson to database when admin logs in first time
+	 * @throws InvalidKeySpecException 
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public void addChairperson() throws NoSuchAlgorithmException, InvalidKeySpecException
+	{
+		//Initalize connection and statements
+		Connection con = null;
+		Statement insert = null;
+		Statement update = null;
+		try {
+			//Initialize Connection and statements
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			insert = con.createStatement();
+			update = con.createStatement();
+			String username = chairpersonUsernameField.getText();
+			String password = chairpersonPasswordField.getText();
+			String passHash = PasswordHash.createHash(password);
+			String position = chairpersonPositionField.getText();
+			String name = chairpersonNameField.getText();
+			String surname = chairpersonSurnameField.getText();
+			String sql = "INSERT INTO `s564387_clubreg`.`officials` (`Official_ID`, `username`, `password`,`position`,`name`,`surname`)"
+					+ " VALUES (NULL, ('"+username+"'),('"+passHash+"'),('"+position+"'),('"+name+"'),('"+surname+"') )";
+			//Execute SQL statement
+			update.executeUpdate(sql);
+			chairpersonUsernameField.setText("");
+			chairpersonPasswordField.setText("");
+			chairpersonNameField.setText("");
+			chairpersonSurnameField.setText("");
+			JOptionPane.showMessageDialog(null,"Chairperson added!","Missing info",2);
+		} catch (SQLException e) {
+			//Show warning message
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add chairperson","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//Close statement
+				insert.close();
+			}catch(SQLException e){}
+			try{
+				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
 	}
 	/**
 	 * Method to clear all fields on receptionist screen
