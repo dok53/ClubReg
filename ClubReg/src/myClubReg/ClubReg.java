@@ -1152,18 +1152,18 @@ public class ClubReg {
 		}
 		try {
 			//Initialize Connection and statements
-			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");//s564387_dbaccess granted priv in phpmyadmin
 			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
 			insert = con.createStatement();
 			update = con.createStatement();
 			//Execute SQL statement
-			String sql = ("INSERT INTO `clubreg`.`players` (`firstName`, `surname`, `status`, `houseNumber`, `dob`, `street`, `email`,"
+			update.executeUpdate("INSERT INTO `s564387_clubreg`.`players` (`firstName`, `surname`, `status`, `houseNumber`, `dob`, `street`, `email`,"
 					+ " `townCity`, `phoneNumber`, `county`, `lastClub`, `lastLeague`, `parentFirstName`, `parentSurname`, `dateOfReg`, `feesPaid`,"
 					+ " `yellowCards`, `redCards`, `trainingAttended`, `goals`, `cleanSheets`, `imagePath`, `Team_ID`)"
 					+ " VALUES (('"+fNameFieldRecep.getText()+"'), ('"+sNameFieldRecep.getText()+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText()+"'),"
 					+ " ('"+pDOBFieldRecep.getText()+"'), ('"+pStreetFieldRecep.getText()+"'), ('"+PEmailFieldRecep.getText()+"'), ('"+pTownCityFieldRecep.getText()+"'), ('"+pContactRecep.getText()+"'),"
 					+ " ('"+pCountyRecepField.getText()+"'), ('"+pLastClubRecepField.getText()+"'), ('"+pLastLeagueFieldrecep.getText()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText()+"'),('"+teamID+"'));");
-			update.executeQuery(sql);
+		
 		} catch (SQLException e) {
 			//Show warning message
 			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot save player","Missing info",2);
@@ -1597,6 +1597,7 @@ public class ClubReg {
 		}
 	}
 	/**
+	 * Method to create official at the club
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeySpecException
 	 */
