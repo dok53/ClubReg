@@ -70,6 +70,7 @@ import javax.swing.JPasswordField;
 public class ClubReg {
 	// Array lists with club products
 	String [] gear = {"Shorts", "Socks"};
+	String [] officialPositions = {"Chairperson","Secretary", "Treasurer" };
 	String [] columnNames = {"First name", "Surname", "Phone number", "Fees paid", "YC", "RC","Training", "Goals", "CS"};
 	//Create frame to hold cards
 	private JFrame frmClubreg;
@@ -135,6 +136,7 @@ public class ClubReg {
 	final private String ADD_MANAGER = "Add manager panel";
 	final private String CHAIRMAN = "Chairman panel";
 	final private String ADMIN = "Admin panel";
+	final private String OFFICIAL = "Add official panel";
 	private JLabel lblAllPlayers;
 	//Create team
 	private JPanel createTeam;
@@ -177,6 +179,14 @@ public class ClubReg {
 	private JLabel lblPosition;
 	private JTextField chairpersonPositionField;
 	private JButton btnCreateManager;
+	private JPanel addOfficial;
+	private JTextField addOfficialNameField;
+	private JTextField addOfficialSurnameField;
+	private JTextField addOfficialUsernameField;
+	private JPasswordField addOfficialPasswordField;
+	private JButton createOfficialBtn;
+	private JButton createOfficialLogoutBtn;
+	private JComboBox<String> addOfficialPositionBox;
 
 	/**
 	 * Launch the application.
@@ -213,13 +223,13 @@ public class ClubReg {
 		fillOfficials();
 
 		//Encrypt and Decrypt data
-		String password = "derek";
+		//String password = "derek";
 		/*String passwordEnc = AES.encrypt(password);
         String passwordDec = AES.decrypt(passwordEnc);
         System.out.println((passwordEnc + " " + passwordDec));*/
 
-
-		//Store only the hash of the password when created
+		//Pasword hashing
+		/*//Store only the hash of the password when created
 		//when the user enters their password to login, create the hash again 
 		//then check if both hash's match and grant access depending on the case
 		String passHash = PasswordHash.createHash(password);
@@ -231,7 +241,7 @@ public class ClubReg {
 		if(!PasswordHash.validatePassword(password, passHash))
 		{
 			System.out.println("Entry Not Granted");
-		}
+		}*/
 		//init
 		initialize();
 	}
@@ -851,7 +861,7 @@ public class ClubReg {
 				cl.show(cards, RECEP);
 			}
 		});
-		btnReceptionChairman.setBounds(164, 255, 277, 25);
+		btnReceptionChairman.setBounds(164, 262, 277, 25);
 		chairman.add(btnReceptionChairman);
 
 		JButton btnPlayersChairman = new JButton("Players");
@@ -861,7 +871,7 @@ public class ClubReg {
 				cl.show(cards, MANAGER);
 			}
 		});
-		btnPlayersChairman.setBounds(526, 255, 272, 25);
+		btnPlayersChairman.setBounds(526, 262, 272, 25);
 		chairman.add(btnPlayersChairman);
 
 		JButton btnTeamsChairman = new JButton("Teams");
@@ -906,6 +916,16 @@ public class ClubReg {
 		});
 		btnCreateManager.setBounds(526, 385, 272, 25);
 		chairman.add(btnCreateManager);
+
+		JButton btnAddOfficial = new JButton("Add official");
+		btnAddOfficial.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, OFFICIAL);
+			}
+		});
+		btnAddOfficial.setBounds(164, 448, 277, 25);
+		chairman.add(btnAddOfficial);
 		//Setup Admin panel
 		admin = new JPanel();
 		admin.setBackground(Color.WHITE);
@@ -999,6 +1019,91 @@ public class ClubReg {
 		admin.add(chairpersonPositionField);
 		chairpersonPositionField.setColumns(10);
 
+		addOfficial = new JPanel();
+		addOfficial.setBackground(Color.WHITE);
+		cards.add(addOfficial, OFFICIAL);
+		addOfficial.setLayout(null);
+
+		JLabel label = new JLabel("");
+		label.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		label.setBounds(75, 0, 814, 98);
+		addOfficial.add(label);
+
+		JLabel lblAddOfficial = new JLabel("Add Official");
+		lblAddOfficial.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAddOfficial.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblAddOfficial.setBounds(75, 136, 814, 16);
+		addOfficial.add(lblAddOfficial);
+
+		JLabel lblName = new JLabel("Name");
+		lblName.setBounds(326, 201, 143, 16);
+		addOfficial.add(lblName);
+
+		JLabel lblSurname = new JLabel("Surname");
+		lblSurname.setBounds(326, 255, 56, 16);
+		addOfficial.add(lblSurname);
+
+		JLabel lblPassword_1 = new JLabel("Password");
+		lblPassword_1.setBounds(326, 357, 143, 16);
+		addOfficial.add(lblPassword_1);
+
+		JLabel lblUsername_1 = new JLabel("Username");
+		lblUsername_1.setBounds(326, 307, 143, 16);
+		addOfficial.add(lblUsername_1);
+
+		JLabel lblPosition_1 = new JLabel("Position");
+		lblPosition_1.setBounds(326, 410, 143, 16);
+		addOfficial.add(lblPosition_1);
+
+		addOfficialNameField = new JTextField();
+		addOfficialNameField.setBounds(481, 198, 189, 22);
+		addOfficial.add(addOfficialNameField);
+		addOfficialNameField.setColumns(10);
+
+		addOfficialSurnameField = new JTextField();
+		addOfficialSurnameField.setBounds(481, 252, 189, 22);
+		addOfficial.add(addOfficialSurnameField);
+		addOfficialSurnameField.setColumns(10);
+
+		addOfficialUsernameField = new JTextField();
+		addOfficialUsernameField.setBounds(481, 304, 189, 22);
+		addOfficial.add(addOfficialUsernameField);
+		addOfficialUsernameField.setColumns(10);
+
+		addOfficialPasswordField = new JPasswordField();
+		addOfficialPasswordField.setBounds(480, 354, 190, 22);
+		addOfficial.add(addOfficialPasswordField);
+
+		addOfficialPositionBox = new JComboBox<String>();
+		addOfficialPositionBox.addItem("Position");
+		for (int i = 0; i < officialPositions.length; i ++){
+			addOfficialPositionBox.addItem(officialPositions[i]);
+		}
+		addOfficialPositionBox.setBounds(481, 404, 189, 22);
+		addOfficial.add(addOfficialPositionBox);
+
+		createOfficialBtn = new JButton("Create");
+		createOfficialBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					createOfficial();
+				} catch (NoSuchAlgorithmException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot add official (action performed)");
+					e1.printStackTrace();
+				} catch (InvalidKeySpecException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot add official (action performed)");
+					e1.printStackTrace();
+				}
+			}
+		});
+		createOfficialBtn.setBounds(442, 480, 97, 25);
+		addOfficial.add(createOfficialBtn);
+
+		createOfficialLogoutBtn = new JButton("Logout");
+		createOfficialLogoutBtn.setBounds(442, 595, 97, 25);
+		addOfficial.add(createOfficialLogoutBtn);
+
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
 		copyrightLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -1011,6 +1116,7 @@ public class ClubReg {
 
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Methods for class
+	////////FIX SAVE PLAYER
 	/**
 	 * Save a player to database
 	 */
@@ -1338,13 +1444,16 @@ public class ClubReg {
 			insert = con.createStatement();
 			update = con.createStatement();
 			String team = createTeamNameField.getText();
-			String sql = "INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`) VALUES (NULL, ('"+team+"'))";
-			//Execute SQL statement
-			//update.executeUpdate("INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`)"
-			//	+ " VALUES (NULL, ('"+createTeamNameField.getText()+"')");
-			update.executeUpdate(sql);
-			JOptionPane.showMessageDialog(null,"Team created. " + "Team name = " + team,"Missing info",2);
-			createTeamNameField.setText("");
+			//Make sure a team name is entered
+			if (team.length() > 1){
+				String sql = "INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`) VALUES (NULL, ('"+team+"'))";
+				update.executeUpdate(sql);
+				JOptionPane.showMessageDialog(null,"Team created. " + "Team name = " + team,"Missing info",2);
+				createTeamNameField.setText("");
+			}
+			else{
+				JOptionPane.showMessageDialog(null,"No team name entered","Missing info",2);
+			}
 		} catch (SQLException e) {
 			//Show warning message
 			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add team","Missing info",2);
@@ -1384,15 +1493,21 @@ public class ClubReg {
 			String position = chairpersonPositionField.getText();
 			String name = chairpersonNameField.getText();
 			String surname = chairpersonSurnameField.getText();
-			String sql = "INSERT INTO `s564387_clubreg`.`officials` (`Official_ID`, `username`, `password`,`position`,`name`,`surname`)"
-					+ " VALUES (NULL, ('"+username+"'),('"+passHash+"'),('"+position+"'),('"+name+"'),('"+surname+"') )";
-			//Execute SQL statement
-			update.executeUpdate(sql);
-			chairpersonUsernameField.setText("");
-			chairpersonPasswordField.setText("");
-			chairpersonNameField.setText("");
-			chairpersonSurnameField.setText("");
-			JOptionPane.showMessageDialog(null,"Chairperson added!","Missing info",2);
+			//Check if any fields are blank
+			if (name.length() > 1 && surname.length() > 1 && username.length() > 1 && password.length() > 1 && position.length() > 0){
+				String sql = "INSERT INTO `s564387_clubreg`.`officials` (`Official_ID`, `username`, `password`,`position`,`name`,`surname`)"
+						+ " VALUES (NULL, ('"+username+"'),('"+passHash+"'),('"+position+"'),('"+name+"'),('"+surname+"') )";
+				//Execute SQL statement
+				update.executeUpdate(sql);
+				chairpersonUsernameField.setText("");
+				chairpersonPasswordField.setText("");
+				chairpersonNameField.setText("");
+				chairpersonSurnameField.setText("");
+				JOptionPane.showMessageDialog(null,"Chairperson added!","Missing info",2);
+			}
+			else{
+				JOptionPane.showMessageDialog(null, "Missing fields!!");
+			}
 		} catch (SQLException e) {
 			//Show warning message
 			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add chairperson","Missing info",2);
@@ -1428,13 +1543,13 @@ public class ClubReg {
 			update = con.createStatement();
 			String password = new String (newManagerPassword.getPassword());
 			String passHash = PasswordHash.createHash(password);
-			
+
 			String name = newManagerName.getText();
 			String surname = newManagerSurname.getText();
 			String team = newManagerTeamName.getText();
 			String username = newManagerUsername.getText();
 			int teamID = 0;
-			
+
 			String teamNameID = newManagerTeamIDBox.getSelectedItem().toString();
 			//set team id for primary key in manager
 			for (Entry<String, Integer> entry : teamAndId.entrySet()){
@@ -1443,25 +1558,91 @@ public class ClubReg {
 					System.out.println(teamID);
 				}
 			}
-			//if no team set warn the user
-			if (teamID == 0){
-				JOptionPane.showMessageDialog(null, "Please select a team from the dropdown box");
+			// check for empty fields
+			if (name.length() > 1 && surname.length() > 1 && username.length() > 1 && password.length() > 1 && team.length() > 0){
+				//if no team set, warn the user
+				if (teamID == 0){
+					JOptionPane.showMessageDialog(null, "Please select a team from the dropdown box");
+				}
+				else{
+					String sql = "INSERT INTO `s564387_clubreg`.`manager` (`Manager_ID`, `Name`, `Surname`, `Team`, `password`, `username`, `Team_ID`) "
+							+ "VALUES (NULL, ('"+name+"'), ('"+surname+"'), ('"+team+"'), ('"+passHash+"'), ('"+username+"'), ('"+teamID+"'))";
+					//Execute SQL statement
+					update.executeUpdate(sql);
+					newManagerName.setText("");
+					newManagerSurname.setText("");
+					newManagerUsername.setText("");
+					newManagerPassword.setText("");
+					newManagerTeamName.setText("");
+					JOptionPane.showMessageDialog(null,"Manager added!","Missing info",2);
+				}
 			}
 			else{
-				String sql = "INSERT INTO `s564387_clubreg`.`manager` (`Manager_ID`, `Name`, `Surname`, `Team`, `password`, `username`, `Team_ID`) "
-						+ "VALUES (NULL, ('"+name+"'), ('"+surname+"'), ('"+team+"'), ('"+passHash+"'), ('"+username+"'), ('"+teamID+"'))";
-				//Execute SQL statement
-				update.executeUpdate(sql);
-				newManagerName.setText("");
-				newManagerSurname.setText("");
-				newManagerUsername.setText("");
-				newManagerPassword.setText("");
-				newManagerTeamName.setText("");
-				JOptionPane.showMessageDialog(null,"Manager added!","Missing info",2);
+				JOptionPane.showMessageDialog(null,"Missing fields!","Missing info",2);
 			}
 		} catch (SQLException e) {
 			//Show warning message
 			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add Manager","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//Close statement
+				insert.close();
+			}catch(SQLException e){}
+			try{
+				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
+	/**
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 */
+	public void createOfficial() throws NoSuchAlgorithmException, InvalidKeySpecException
+	{
+		//Initalize connection and statements
+		Connection con = null;
+		Statement insert = null;
+		Statement update = null;
+		try {
+			//Initialize Connection and statements
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			insert = con.createStatement();
+			update = con.createStatement();
+			String password = new String (addOfficialPasswordField.getPassword());
+			String passHash = PasswordHash.createHash(password);
+
+			String name = addOfficialNameField.getText();
+			String surname = addOfficialSurnameField.getText();
+			String username = addOfficialUsernameField.getText();
+			String position = addOfficialPositionBox.getSelectedItem().toString();
+			if (name.length() > 1 && surname.length() > 1 && username.length() > 1 && password.length() > 1){
+				if(!position.equalsIgnoreCase("position")){
+					String sql = "INSERT INTO `s564387_clubreg`.`officials` (`Official_ID`, `Name`, `Surname`, `password`, `username`, `position`) "
+							+ "VALUES (NULL, ('"+name+"'), ('"+surname+"'), ('"+passHash+"'),('"+username+"'), ('"+position+"'))";
+					//Execute SQL statement
+					update.executeUpdate(sql);
+					addOfficialNameField.setText("");
+					addOfficialSurnameField.setText("");
+					addOfficialUsernameField.setText("");
+					addOfficialPasswordField.setText("");
+					addOfficialPositionBox.setSelectedIndex(0);
+
+					JOptionPane.showMessageDialog(null,position + " added!","Missing info",2);
+				}
+				else{
+					JOptionPane.showMessageDialog(null,"You must select a position!","Missing info",2);
+				}
+			}
+			else{
+				JOptionPane.showMessageDialog(null,"Missing fields!","Missing info",2);
+			}
+		} catch (SQLException e) {
+			//Show warning message
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add Official","Missing info",2);
 			e.printStackTrace();
 		}
 		finally{
