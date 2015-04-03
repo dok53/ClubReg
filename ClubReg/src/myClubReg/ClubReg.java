@@ -801,6 +801,19 @@ public class ClubReg {
 		addManager.add(newManagerTeamIDBox);
 
 		JButton newManagerCreateBtn = new JButton("Create");
+		newManagerCreateBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					addManager();
+				} catch (NoSuchAlgorithmException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot add manager (Action performed)");
+					e1.printStackTrace();
+				} catch (InvalidKeySpecException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot add manager (Action performed)");
+					e1.printStackTrace();
+				}
+			}
+		});
 		newManagerCreateBtn.setBounds(336, 549, 309, 25);
 		addManager.add(newManagerCreateBtn);
 
@@ -883,7 +896,7 @@ public class ClubReg {
 		});
 		btnCreateTeamChairman.setBounds(164, 385, 277, 25);
 		chairman.add(btnCreateTeamChairman);
-		
+
 		btnCreateManager = new JButton("Create Manager");
 		btnCreateManager.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -973,11 +986,11 @@ public class ClubReg {
 		});
 		btnChairpersonLogout.setBounds(425, 599, 97, 25);
 		admin.add(btnChairpersonLogout);
-		
+
 		lblPosition = new JLabel("Position");
 		lblPosition.setBounds(310, 220, 157, 16);
 		admin.add(lblPosition);
-		
+
 		chairpersonPositionField = new JTextField();
 		chairpersonPositionField.setEditable(false);
 		chairpersonPositionField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1038,12 +1051,13 @@ public class ClubReg {
 			insert = con.createStatement();
 			update = con.createStatement();
 			//Execute SQL statement
-			update.executeUpdate("INSERT INTO `clubreg`.`players` (`firstName`, `surname`, `status`, `houseNumber`, `dob`, `street`, `email`,"
+			String sql = ("INSERT INTO `clubreg`.`players` (`firstName`, `surname`, `status`, `houseNumber`, `dob`, `street`, `email`,"
 					+ " `townCity`, `phoneNumber`, `county`, `lastClub`, `lastLeague`, `parentFirstName`, `parentSurname`, `dateOfReg`, `feesPaid`,"
 					+ " `yellowCards`, `redCards`, `trainingAttended`, `goals`, `cleanSheets`, `imagePath`, `Team_ID`)"
 					+ " VALUES (('"+fNameFieldRecep.getText()+"'), ('"+sNameFieldRecep.getText()+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText()+"'),"
 					+ " ('"+pDOBFieldRecep.getText()+"'), ('"+pStreetFieldRecep.getText()+"'), ('"+PEmailFieldRecep.getText()+"'), ('"+pTownCityFieldRecep.getText()+"'), ('"+pContactRecep.getText()+"'),"
 					+ " ('"+pCountyRecepField.getText()+"'), ('"+pLastClubRecepField.getText()+"'), ('"+pLastLeagueFieldrecep.getText()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText()+"'),('"+teamID+"'));");
+			update.executeQuery(sql);
 		} catch (SQLException e) {
 			//Show warning message
 			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot save player","Missing info",2);
@@ -1279,15 +1293,19 @@ public class ClubReg {
 	}
 	/**
 	 * Check the login credentials of the managers
+	 * @throws InvalidKeySpecException 
+	 * @throws NoSuchAlgorithmException 
+	 * @throws NumberFormatException 
 	 */
-	public void managerLoginCheck()
+	public void managerLoginCheck() throws NumberFormatException, NoSuchAlgorithmException, InvalidKeySpecException
 	{
 		for (int i = 0; i < managers.size(); i ++)
 		{
 			if (userLoginField.getText().equalsIgnoreCase(managers.get(i).getManagerUsername()))
 			{
 				String password = new String(passLoginField.getPassword());
-				if (password.equalsIgnoreCase(managers.get(i).getmanagerPassword()))
+				String passHash = managers.get(i).getmanagerPassword();
+				if(PasswordHash.validatePassword(password, passHash))
 				{
 					found = true;
 					managerTeamID = managers.get(i).getManagerTeamID();
@@ -1297,6 +1315,9 @@ public class ClubReg {
 					cl.show(cards, MANAGER);
 					//Add appropriate players to table
 					addPlayersToTable(Integer.parseInt(managerTeamID));
+				}
+				else{
+					//put in counter after managers and officials to see if there all looped through
 				}
 			}
 		}
@@ -1375,6 +1396,72 @@ public class ClubReg {
 		} catch (SQLException e) {
 			//Show warning message
 			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add chairperson","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//Close statement
+				insert.close();
+			}catch(SQLException e){}
+			try{
+				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
+	/**
+	 * Add Manager method
+	 * @throws InvalidKeySpecException 
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public void addManager() throws NoSuchAlgorithmException, InvalidKeySpecException
+	{
+		//Initalize connection and statements
+		Connection con = null;
+		Statement insert = null;
+		Statement update = null;
+		try {
+			//Initialize Connection and statements
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			insert = con.createStatement();
+			update = con.createStatement();
+			String password = new String (newManagerPassword.getPassword());
+			String passHash = PasswordHash.createHash(password);
+			
+			String name = newManagerName.getText();
+			String surname = newManagerSurname.getText();
+			String team = newManagerTeamName.getText();
+			String username = newManagerUsername.getText();
+			int teamID = 0;
+			
+			String teamNameID = newManagerTeamIDBox.getSelectedItem().toString();
+			//set team id for primary key in manager
+			for (Entry<String, Integer> entry : teamAndId.entrySet()){
+				if(teamNameID.equalsIgnoreCase(entry.getKey())){
+					teamID = entry.getValue();
+					System.out.println(teamID);
+				}
+			}
+			//if no team set warn the user
+			if (teamID == 0){
+				JOptionPane.showMessageDialog(null, "Please select a team from the dropdown box");
+			}
+			else{
+				String sql = "INSERT INTO `s564387_clubreg`.`manager` (`Manager_ID`, `Name`, `Surname`, `Team`, `password`, `username`, `Team_ID`) "
+						+ "VALUES (NULL, ('"+name+"'), ('"+surname+"'), ('"+team+"'), ('"+passHash+"'), ('"+username+"'), ('"+teamID+"'))";
+				//Execute SQL statement
+				update.executeUpdate(sql);
+				newManagerName.setText("");
+				newManagerSurname.setText("");
+				newManagerUsername.setText("");
+				newManagerPassword.setText("");
+				newManagerTeamName.setText("");
+				JOptionPane.showMessageDialog(null,"Manager added!","Missing info",2);
+			}
+		} catch (SQLException e) {
+			//Show warning message
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add Manager","Missing info",2);
 			e.printStackTrace();
 		}
 		finally{
