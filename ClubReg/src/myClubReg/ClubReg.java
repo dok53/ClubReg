@@ -139,6 +139,7 @@ public class ClubReg {
 	final private String ADMIN = "Admin panel";
 	final private String OFFICIAL = "Add official panel";
 	final private String CHANGE_PASSWORD = "Change password panel";
+	final private String RESET_PASSWORD = "Reset password panel";
 	private JLabel lblAllPlayers;
 	//Create team
 	private JPanel createTeam;
@@ -173,6 +174,7 @@ public class ClubReg {
 	private boolean found = false;
 	private JPasswordField passLoginField;
 	private JButton btnBackCreateTeam;
+	// Admin panel
 	private JPanel admin;
 	private JTextField chairpersonNameField;
 	private JTextField chairpersonSurnameField;
@@ -181,6 +183,7 @@ public class ClubReg {
 	private JLabel lblPosition;
 	private JTextField chairpersonPositionField;
 	private JButton btnCreateManager;
+	// Add official panel
 	private JPanel addOfficial;
 	private JTextField addOfficialNameField;
 	private JTextField addOfficialSurnameField;
@@ -189,9 +192,20 @@ public class ClubReg {
 	private JButton createOfficialBtn;
 	private JButton createOfficialLogoutBtn;
 	private JComboBox<String> addOfficialPositionBox;
+	// Change password panel
 	private JTextField changePassUsernameField;
 	private JPasswordField changePassPasswordField;
 	private JPasswordField changePassNewPassField;
+	//Reset password panel
+	private JPanel resetPassword;
+	private JComboBox<String> comboBox;
+	private JLabel label_2;
+	private JLabel lblResetPassword;
+	private JLabel lblUserType;
+	private JTextField resetPassNameField;
+	private JTextField resetPassSurnameField;
+	private JPasswordField resetPassPasswordField;
+	private JButton btnResetUserPassword;
 
 	/**
 	 * Launch the application.
@@ -944,6 +958,16 @@ public class ClubReg {
 		});
 		btnAddOfficial.setBounds(164, 448, 277, 25);
 		chairman.add(btnAddOfficial);
+
+		btnResetUserPassword = new JButton("Reset user password");
+		btnResetUserPassword.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, RESET_PASSWORD);
+			}
+		});
+		btnResetUserPassword.setBounds(526, 448, 272, 25);
+		chairman.add(btnResetUserPassword);
 		//Setup Admin panel
 		admin = new JPanel();
 		admin.setBackground(Color.WHITE);
@@ -1190,6 +1214,87 @@ public class ClubReg {
 		changePassNewPassField = new JPasswordField();
 		changePassNewPassField.setBounds(488, 351, 160, 22);
 		changePassword.add(changePassNewPassField);
+		// Reset password panel
+		resetPassword = new JPanel();
+		resetPassword.setBackground(Color.WHITE);
+		cards.add(resetPassword, RESET_PASSWORD);
+		resetPassword.setLayout(null);
+
+		label_2 = new JLabel("");
+		label_2.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
+		label_2.setHorizontalAlignment(SwingConstants.CENTER);
+		label_2.setBounds(75, 0, 814, 98);
+		resetPassword.add(label_2);
+
+		lblResetPassword = new JLabel("Reset password");
+		lblResetPassword.setHorizontalAlignment(SwingConstants.CENTER);
+		lblResetPassword.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblResetPassword.setBounds(75, 136, 814, 26);
+		resetPassword.add(lblResetPassword);
+
+		lblUserType = new JLabel("User type");
+		lblUserType.setBounds(304, 199, 126, 16);
+		resetPassword.add(lblUserType);
+
+		comboBox = new JComboBox<String>();
+		comboBox.addItem("Type");
+		comboBox.addItem("Official");
+		comboBox.addItem("Manager");
+		comboBox.setBounds(487, 196, 155, 22);
+		resetPassword.add(comboBox);
+
+		JLabel lblFirstName = new JLabel("First name");
+		lblFirstName.setBounds(304, 269, 126, 16);
+		resetPassword.add(lblFirstName);
+
+		JLabel lblSurname_1 = new JLabel("Surname");
+		lblSurname_1.setBounds(304, 343, 126, 16);
+		resetPassword.add(lblSurname_1);
+
+		JLabel lblNewPassword_1 = new JLabel("New password");
+		lblNewPassword_1.setBounds(304, 413, 126, 16);
+		resetPassword.add(lblNewPassword_1);
+
+		resetPassNameField = new JTextField();
+		resetPassNameField.setBounds(487, 266, 155, 22);
+		resetPassword.add(resetPassNameField);
+		resetPassNameField.setColumns(10);
+
+		resetPassSurnameField = new JTextField();
+		resetPassSurnameField.setBounds(487, 340, 155, 22);
+		resetPassword.add(resetPassSurnameField);
+		resetPassSurnameField.setColumns(10);
+
+		resetPassPasswordField = new JPasswordField();
+		resetPassPasswordField.setBounds(487, 410, 155, 22);
+		resetPassword.add(resetPassPasswordField);
+
+		JButton btnSubmit = new JButton("Submit");
+		btnSubmit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					resetPassword();
+				} catch (NoSuchAlgorithmException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot reset password(Action performed)");
+					e1.printStackTrace();
+				} catch (InvalidKeySpecException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot reset password(Action performed)");
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnSubmit.setBounds(427, 480, 97, 25);
+		resetPassword.add(btnSubmit);
+
+		JButton btnBack = new JButton("Back");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, CHAIRMAN);
+			}
+		});
+		btnBack.setBounds(427, 599, 97, 25);
+		resetPassword.add(btnBack);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
@@ -1203,7 +1308,6 @@ public class ClubReg {
 
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Methods for class
-	////////FIX SAVE PLAYER
 	/**
 	 * Save a player to database
 	 */
@@ -1319,7 +1423,7 @@ public class ClubReg {
 			ResultSet result = selectStatement.executeQuery();
 			while (result.next())
 			{
-				Manager manager = new Manager(result.getString(2), result.getString(6), result.getString(5), result.getString(7));
+				Manager manager = new Manager(result.getString(2), result.getString(3), result.getString(6), result.getString(5), result.getString(7));
 				managers.add(manager);
 			}
 		} catch (SQLException e) {
@@ -1769,7 +1873,7 @@ public class ClubReg {
 	public String getManagerTeamID() {
 		return managerTeamID;
 	}
-	/* Change password method
+	/** Change password method
 	 * @throws InvalidKeySpecException 
 	 * @throws NoSuchAlgorithmException 
 	 */
@@ -1863,6 +1967,78 @@ public class ClubReg {
 		this.managerTeamID = managerTeamID;
 	}
 
+	/** Reset password method
+	 * @throws InvalidKeySpecException 
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public void resetPassword() throws NoSuchAlgorithmException, InvalidKeySpecException
+	{
+		//Initalize connection and statements
+		Connection con = null;
+		Statement insert = null;
+		Statement update = null;
+		try {
+			//Initialize Connection and statements
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			insert = con.createStatement();
+			update = con.createStatement();
+			// Get new password and hash it to replace the old hash
+			String newPass = new String (resetPassPasswordField.getPassword());
+			String newPassHash = PasswordHash.createHash(newPass);
+			String type = comboBox.getSelectedItem().toString();
+			String name = resetPassNameField.getText();
+			String surname = resetPassSurnameField.getText();
+			if (type.equalsIgnoreCase("Manager")){
+				for (int i = 0; i < managers.size(); i ++)
+				{
+					if (name.equalsIgnoreCase(managers.get(i).getmanagerName())){
+						if (surname.equalsIgnoreCase(managers.get(i).getManagerSurname())){
+							String sql = ("UPDATE `manager` SET `password` = ('"+newPassHash+"') WHERE `name` = ('"+name+"') AND `surname` = ('"+surname+"')");
+							update.executeUpdate(sql);
+							resetPassNameField.setText("");
+							resetPassPasswordField.setText("");
+							resetPassSurnameField.setText("");
+							JOptionPane.showMessageDialog(null, "Password reset");
+						}
+					}
+				}
+			}
+			else if (type.equalsIgnoreCase("Official")){
+				for (int i = 0; i < officials.size(); i ++)
+				{
+					if (name.equalsIgnoreCase(officials.get(i).getName())){
+						if (surname.equalsIgnoreCase(officials.get(i).getSurname())){
+							String sql = ("UPDATE `officials` SET `password` = ('"+newPassHash+"') WHERE `name` = ('"+name+"') AND `surname` = ('"+surname+"')");
+							update.executeUpdate(sql);
+							resetPassNameField.setText("");
+							resetPassPasswordField.setText("");
+							resetPassSurnameField.setText("");
+							JOptionPane.showMessageDialog(null, "Password reset");
+						}
+					}
+				}
+			}
+			else{
+				JOptionPane.showMessageDialog(null, "Not found");
+			}
+		}
+		catch (SQLException e) {
+			//Show warning message
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot reset password","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//Close statement
+				insert.close();
+			}catch(SQLException e){}
+			try{
+				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
 	/**
 	 * @return the found
 	 */

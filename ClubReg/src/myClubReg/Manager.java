@@ -8,6 +8,7 @@ package myClubReg;
  */
 public class Manager {
 	private String managerName;
+	private String managerSurname;
 	private String managerUsername;
 	private String managerPassword;
 	private String managerTeamID;
@@ -18,9 +19,10 @@ public class Manager {
 	 * @param managerPassword
 	 * @param managerTeamID
 	 */
-	public Manager(String managerName, String managerUsername, String managerPassword, String managerTeamID)
+	public Manager(String managerName, String managerSurname, String managerUsername, String managerPassword, String managerTeamID)
 	{
 		this.managerName = managerName;
+		this.managerSurname = managerSurname;
 		this.managerUsername = managerUsername;
 		this.managerPassword = managerPassword;
 		this.managerTeamID = managerTeamID;
@@ -76,6 +78,18 @@ public class Manager {
 	 */
 	public void setManagerTeamID(String teamID) {
 		this.managerTeamID = teamID;
+	}
+	/**
+	 * @return the managerSurname
+	 */
+	public String getManagerSurname() {
+		return managerSurname;
+	}
+	/**
+	 * @param managerSurname the managerSurname to set
+	 */
+	public void setManagerSurname(String managerSurname) {
+		this.managerSurname = managerSurname;
 	}
 
 }
