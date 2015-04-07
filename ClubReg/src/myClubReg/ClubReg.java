@@ -65,6 +65,7 @@ import javax.swing.JSeparator;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JScrollPane;
 import javax.swing.JPasswordField;
+import java.awt.SystemColor;
 
 
 public class ClubReg {
@@ -137,6 +138,7 @@ public class ClubReg {
 	final private String CHAIRMAN = "Chairman panel";
 	final private String ADMIN = "Admin panel";
 	final private String OFFICIAL = "Add official panel";
+	final private String CHANGE_PASSWORD = "Change password panel";
 	private JLabel lblAllPlayers;
 	//Create team
 	private JPanel createTeam;
@@ -187,6 +189,9 @@ public class ClubReg {
 	private JButton createOfficialBtn;
 	private JButton createOfficialLogoutBtn;
 	private JComboBox<String> addOfficialPositionBox;
+	private JTextField changePassUsernameField;
+	private JPasswordField changePassPasswordField;
+	private JPasswordField changePassNewPassField;
 
 	/**
 	 * Launch the application.
@@ -337,12 +342,25 @@ public class ClubReg {
 		});
 		loginLogo.setIcon(new ImageIcon(ClubReg.class.getResource("/images/logo.png")));
 		loginLogo.setHorizontalAlignment(SwingConstants.CENTER);
-		loginLogo.setBounds(406, 340, 116, 104);
+		loginLogo.setBounds(407, 358, 116, 104);
 		login.add(loginLogo);
 
 		passLoginField = new JPasswordField();
 		passLoginField.setBounds(464, 287, 116, 22);
 		login.add(passLoginField);
+
+		JLabel lblChangePassword = new JLabel("Change password");
+		lblChangePassword.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, CHANGE_PASSWORD);
+			}
+		});
+		lblChangePassword.setForeground(new Color(0, 0, 255));
+		lblChangePassword.setHorizontalAlignment(SwingConstants.CENTER);
+		lblChangePassword.setBounds(341, 329, 239, 16);
+		login.add(lblChangePassword);
 
 		//Setup the reception screen
 		reception = new JPanel();
@@ -1103,6 +1121,75 @@ public class ClubReg {
 		createOfficialLogoutBtn = new JButton("Logout");
 		createOfficialLogoutBtn.setBounds(442, 595, 97, 25);
 		addOfficial.add(createOfficialLogoutBtn);
+		// Change password screen layout
+		JPanel changePassword = new JPanel();
+		changePassword.setBackground(Color.WHITE);
+		cards.add(changePassword, CHANGE_PASSWORD);
+		changePassword.setLayout(null);
+
+		JLabel label_1 = new JLabel("");
+		label_1.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
+		label_1.setHorizontalAlignment(SwingConstants.CENTER);
+		label_1.setBounds(75, 0, 814, 98);
+		changePassword.add(label_1);
+
+		JLabel lblChangePassword_1 = new JLabel("Change password");
+		lblChangePassword_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblChangePassword_1.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblChangePassword_1.setBounds(75, 136, 814, 26);
+		changePassword.add(lblChangePassword_1);
+
+		JLabel lblUsername_2 = new JLabel("Username");
+		lblUsername_2.setBounds(327, 216, 107, 16);
+		changePassword.add(lblUsername_2);
+
+		JLabel lblPassword_2 = new JLabel("Password");
+		lblPassword_2.setBounds(327, 282, 107, 16);
+		changePassword.add(lblPassword_2);
+
+		JLabel lblNewPassword = new JLabel("New password");
+		lblNewPassword.setBounds(327, 354, 107, 16);
+		changePassword.add(lblNewPassword);
+
+		JButton btnSubmitChangePassword = new JButton("Submit");
+		btnSubmitChangePassword.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					changePassword();
+				} catch (NoSuchAlgorithmException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot change password (Action performed)");
+					e1.printStackTrace();
+				} catch (InvalidKeySpecException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot change password (Action performed)");
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnSubmitChangePassword.setBounds(430, 437, 97, 25);
+		changePassword.add(btnSubmitChangePassword);
+
+		JButton btnBackChangePassword = new JButton("Back");
+		btnBackChangePassword.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, LOGIN);
+			}
+		});
+		btnBackChangePassword.setBounds(430, 590, 97, 25);
+		changePassword.add(btnBackChangePassword);
+
+		changePassUsernameField = new JTextField();
+		changePassUsernameField.setBounds(488, 213, 160, 22);
+		changePassword.add(changePassUsernameField);
+		changePassUsernameField.setColumns(10);
+
+		changePassPasswordField = new JPasswordField();
+		changePassPasswordField.setBounds(488, 279, 160, 22);
+		changePassword.add(changePassPasswordField);
+
+		changePassNewPassField = new JPasswordField();
+		changePassNewPassField.setBounds(488, 351, 160, 22);
+		changePassword.add(changePassNewPassField);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
@@ -1163,7 +1250,7 @@ public class ClubReg {
 					+ " VALUES (('"+fNameFieldRecep.getText()+"'), ('"+sNameFieldRecep.getText()+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText()+"'),"
 					+ " ('"+pDOBFieldRecep.getText()+"'), ('"+pStreetFieldRecep.getText()+"'), ('"+PEmailFieldRecep.getText()+"'), ('"+pTownCityFieldRecep.getText()+"'), ('"+pContactRecep.getText()+"'),"
 					+ " ('"+pCountyRecepField.getText()+"'), ('"+pLastClubRecepField.getText()+"'), ('"+pLastLeagueFieldrecep.getText()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText()+"'),('"+teamID+"'));");
-		
+
 		} catch (SQLException e) {
 			//Show warning message
 			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot save player","Missing info",2);
@@ -1682,7 +1769,93 @@ public class ClubReg {
 	public String getManagerTeamID() {
 		return managerTeamID;
 	}
+	/* Change password method
+	 * @throws InvalidKeySpecException 
+	 * @throws NoSuchAlgorithmException 
+	 */
+	public void changePassword() throws NoSuchAlgorithmException, InvalidKeySpecException
+	{
+		//Initalize connection and statements
+		Connection con = null;
+		Statement insert = null;
+		Statement update = null;
+		try {
+			//Initialize Connection and statements
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			boolean isFound = false;
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			insert = con.createStatement();
+			update = con.createStatement();
+			// Get old password to hash it and gain entry
+			String password = new String (changePassPasswordField.getPassword());
+			// Get new password and hash it to replace the old hash
+			String newPass = new String (changePassNewPassField.getPassword());
+			String newPassHash = PasswordHash.createHash(newPass);
 
+			String username = changePassUsernameField.getText();
+			for (int i = 0; i < managers.size(); i ++)
+			{
+				if (username.equalsIgnoreCase(managers.get(i).getManagerUsername())){
+					String managerPassHash = managers.get(i).getmanagerPassword();
+					if(PasswordHash.validatePassword(password, managerPassHash))
+					{
+						isFound = true;
+						String sql = ("UPDATE `manager` SET `password` = ('"+newPassHash+"') WHERE `password` = ('"+managerPassHash+"')");
+						update.executeUpdate(sql);
+						changePassNewPassField.setText("");
+						changePassPasswordField.setText("");
+						changePassUsernameField.setText("");
+						JOptionPane.showMessageDialog(null, "Password changed");
+					}
+					else{
+						changePassNewPassField.setText("");
+						changePassPasswordField.setText("");
+						changePassUsernameField.setText("");
+						JOptionPane.showMessageDialog(null, "Wrong credentials");
+					}
+				}
+			}
+			if(!isFound){
+				for (int i = 0; i < officials.size(); i ++)
+				{
+					if (username.equalsIgnoreCase(officials.get(i).getUsername())){
+						String officialPassHash = officials.get(i).getPassword();
+						if(PasswordHash.validatePassword(password, officialPassHash))
+						{
+							isFound = true;
+							String sql = ("UPDATE `officials` SET `password` = ('"+newPassHash+"') WHERE `password` = ('"+officialPassHash+"')");
+							update.executeUpdate(sql);
+							changePassNewPassField.setText("");
+							changePassPasswordField.setText("");
+							changePassUsernameField.setText("");
+							JOptionPane.showMessageDialog(null, "Password changed");
+						}
+						else{
+							changePassNewPassField.setText("");
+							changePassPasswordField.setText("");
+							changePassUsernameField.setText("");
+							JOptionPane.showMessageDialog(null, "Wrong credentials");
+						}
+					}
+				}
+			}
+		}
+		catch (SQLException e) {
+			//Show warning message
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot change password","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//Close statement
+				insert.close();
+			}catch(SQLException e){}
+			try{
+				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
 	/**
 	 * @param managerTeamID the managerTeamID to set
 	 */
