@@ -24,6 +24,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -105,7 +107,7 @@ public class ClubReg {
 	private JLabel pEmailRecep;
 	private JTextField PEmailFieldRecep;
 	private JLabel pContactRecep;
-	private JTextField pContaceFieldRecep;
+	private JTextField pContactFieldRecep;
 	private JLabel pDetailsRecep;
 	private JLabel pRegRecep;
 	private JLabel pLastClubRecep;
@@ -212,6 +214,8 @@ public class ClubReg {
 	private JButton backManager;
 	private JButton backAddManager;
 	private JButton backAddOfficial;
+	//set to true if chairperson is logged in
+	private boolean isChair = false;
 
 	/**
 	 * Launch the application.
@@ -482,10 +486,10 @@ public class ClubReg {
 		pContactRecep.setBounds(90, 312, 97, 16);
 		reception.add(pContactRecep);
 
-		pContaceFieldRecep = new JTextField();
-		pContaceFieldRecep.setBounds(207, 306, 264, 22);
-		reception.add(pContaceFieldRecep);
-		pContaceFieldRecep.setColumns(10);
+		pContactFieldRecep = new JTextField();
+		pContactFieldRecep.setBounds(207, 306, 264, 22);
+		reception.add(pContactFieldRecep);
+		pContactFieldRecep.setColumns(10);
 
 		pDetailsRecep = new JLabel("Player Details");
 		pDetailsRecep.setFont(new Font("Tahoma", Font.BOLD, 15));
@@ -974,6 +978,7 @@ public class ClubReg {
 		JButton btnLogoutChairman = new JButton("Logout");
 		btnLogoutChairman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				isChair = false;
 				CardLayout cl = (CardLayout)(cards.getLayout());
 				cl.show(cards, LOGIN);
 			}
@@ -1404,7 +1409,7 @@ public class ClubReg {
 					+ " `townCity`, `phoneNumber`, `county`, `lastClub`, `lastLeague`, `parentFirstName`, `parentSurname`, `dateOfReg`, `feesPaid`,"
 					+ " `yellowCards`, `redCards`, `trainingAttended`, `goals`, `cleanSheets`, `imagePath`, `Team_ID`)"
 					+ " VALUES (('"+fNameFieldRecep.getText().trim()+"'), ('"+sNameFieldRecep.getText().trim()+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText().trim()+"'),"
-					+ " ('"+pDOBFieldRecep.getText().trim()+"'), ('"+pStreetFieldRecep.getText().trim()+"'), ('"+PEmailFieldRecep.getText().trim()+"'), ('"+pTownCityFieldRecep.getText().trim()+"'), ('"+pContactRecep.getText().trim()+"'),"
+					+ " ('"+pDOBFieldRecep.getText().trim()+"'), ('"+pStreetFieldRecep.getText().trim()+"'), ('"+PEmailFieldRecep.getText().trim()+"'), ('"+pTownCityFieldRecep.getText().trim()+"'), ('"+pContactFieldRecep.getText().trim()+"'),"
 					+ " ('"+pCountyRecepField.getText().trim()+"'), ('"+pLastClubRecepField.getText().trim()+"'), ('"+pLastLeagueFieldrecep.getText().trim()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText().trim()+"'),('"+teamID+"'));");
 
 		} catch (SQLException e) {
@@ -1577,10 +1582,14 @@ public class ClubReg {
 		Connection con = null;
 		PreparedStatement selectStatement = null;
 		ResultSet result = null;
-		//int id = Integer.parseInt(managerTeamID);
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
-			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players` WHERE `team_ID` = ('"+id+"')");
+			if (!isChair){
+				selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players` WHERE `team_ID` = ('"+id+"') ORDER by `firstName`");
+			}
+			else{
+				selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players` ORDER by `team_ID`");
+			}
 			result = selectStatement.executeQuery();
 			int i = 0;
 			while (result.next()){
@@ -1629,6 +1638,8 @@ public class ClubReg {
 					//Switch statement to show the correct screen to officials
 					switch (position){
 					case "Chairperson":
+						isChair = true;
+						addPlayersToTable(0);
 						CardLayout cl = (CardLayout)(cards.getLayout());
 						cl.show(cards, CHAIRMAN);
 						backReception.setVisible(true);
@@ -1701,6 +1712,17 @@ public class ClubReg {
 				update.executeUpdate(sql);
 				JOptionPane.showMessageDialog(null,"Team created. " + "Team name = " + team,"Missing info",2);
 				createTeamNameField.setText("");
+				//Remove all elements from the team comboBox
+				DefaultComboBoxModel<String> theModel = (DefaultComboBoxModel<String>)newManagerTeamIDBox.getModel();
+				theModel.removeAllElements();
+				// Populate the teams array to include the new team
+				fillTeams();
+				// Refill the comboBox to include the new team
+				newManagerTeamIDBox.addItem("Team");
+				for (Entry<String, Integer> entry : teamAndId.entrySet())
+				{
+					newManagerTeamIDBox.addItem(entry.getKey());
+				}
 				CardLayout cl = (CardLayout)(cards.getLayout());
 				cl.show(cards, ADD_MANAGER);
 			}
@@ -1922,7 +1944,7 @@ public class ClubReg {
 		pStreetFieldRecep.setText("");
 		PEmailFieldRecep.setText("");
 		pTownCityFieldRecep.setText("");
-		pContaceFieldRecep.setText("");
+		pContactFieldRecep.setText("");
 		pCountyRecepField.setText("");
 		pLastClubRecepField.setText("");
 		pLastLeagueFieldrecep.setText("");
@@ -2114,5 +2136,26 @@ public class ClubReg {
 	public void setFound(boolean found) {
 		this.found = found;
 	}
+
+	/**
+	 * @return the isChair
+	 */
+	public boolean isChair() {
+		return isChair;
+	}
+
+	/**
+	 * @param isChair the isChair to set
+	 */
+	public void setChair(boolean isChair) {
+		this.isChair = isChair;
+	}
 }
+//Print contents of comboBox
+/*ComboBoxModel<String> model = newManagerTeamIDBox.getModel();
+int size = model.getSize();
+for(int i=0;i<size;i++) {
+    Object element = model.getElementAt(i);
+    System.out.println("Element at " + i + " = " + element);
+}*/
 
