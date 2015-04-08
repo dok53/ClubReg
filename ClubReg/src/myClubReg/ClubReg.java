@@ -79,6 +79,9 @@ public class ClubReg {
 	String [] gear = {"Shorts", "Socks"};
 	String [] officialPositions = {"Chairperson","Secretary", "Treasurer" };
 	String [] columnNames = {"First name", "Surname", "Phone number", "Fees paid", "YC", "RC","Training", "Goals", "CS"};
+	String [] columnNamesManagers = {"Manager ID", "First name", "Surname", "Team"};
+	String [] columnNamesOfficials = {"Official ID", "First name", "Surname", "Position"};
+	String [] columnNamesTeams = {"Team ID", "Team name"};
 	//Create frame to hold cards
 	private JFrame frmClubreg;
 	//Cards
@@ -145,6 +148,7 @@ public class ClubReg {
 	final private String OFFICIAL = "Add official panel";
 	final private String CHANGE_PASSWORD = "Change password panel";
 	final private String RESET_PASSWORD = "Reset password panel";
+	final private String ALL_MANAGERS = "All managers panel";
 	private JLabel lblAllPlayers;
 	//Create team
 	private JPanel createTeam;
@@ -171,8 +175,11 @@ public class ClubReg {
 	private ArrayList<Manager> managers = new ArrayList<Manager>();
 	private ArrayList<Player> players = new ArrayList<Player>();
 	private ArrayList<Official> officials = new ArrayList<Official>();
-	//Table model
-	final DefaultTableModel model = new DefaultTableModel(players.size(),columnNames.length);//change the 9 to the amount of players in a team
+	//Table models
+	final DefaultTableModel model = new DefaultTableModel(players.size(),columnNames.length);
+	final DefaultTableModel modelManagers = new DefaultTableModel(managers.size(),columnNamesManagers.length);
+	final DefaultTableModel modelOfficials = new DefaultTableModel(officials.size(),columnNamesOfficials.length);
+	final DefaultTableModel modelTeams = new DefaultTableModel(officials.size(),teamAndId.size());
 	//Hold the managers team ID
 	private String managerTeamID;
 	private boolean found = false;
@@ -216,6 +223,8 @@ public class ClubReg {
 	private JButton backAddOfficial;
 	//set to true if chairperson is logged in
 	private boolean isChair = false;
+	private JPanel AllManagers;
+	private JTable table_1;
 
 	/**
 	 * Launch the application.
@@ -250,6 +259,7 @@ public class ClubReg {
 		fillAllPlayers();
 		//Fill all officials on start up
 		fillOfficials();
+		//Fill all managers on start up
 
 		//Encrypt and Decrypt data
 		//String password = "derek";
@@ -967,6 +977,12 @@ public class ClubReg {
 		chairman.add(btnTeamsChairman);
 
 		JButton btnManagersChairman = new JButton("Managers");
+		btnManagersChairman.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, ALL_MANAGERS);
+			}
+		});
 		btnManagersChairman.setBounds(526, 322, 272, 25);
 		chairman.add(btnManagersChairman);
 
@@ -1352,6 +1368,50 @@ public class ClubReg {
 		});
 		btnBack.setBounds(427, 599, 97, 25);
 		resetPassword.add(btnBack);
+		//All managers screen setup
+		AllManagers = new JPanel();
+		AllManagers.setBackground(Color.WHITE);
+		cards.add(AllManagers, ALL_MANAGERS);
+		AllManagers.setLayout(null);
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(83, 257, 814, 312);
+		AllManagers.add(scrollPane_1);
+		
+		table_1 = new JTable(modelManagers)
+		{
+			/**
+			 * Set up table model
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int data, int columns)
+			{
+				return false;
+			}
+		};
+		table_1.setBackground(Color.WHITE);
+		for (int k = 0; k <columnNamesManagers.length; k++)
+		{
+			table_1.getTableHeader().getColumnModel().getColumn(k).setHeaderValue(columnNamesManagers[k]);
+			table_1.getColumnModel().getColumn(k).setPreferredWidth(94);
+		}
+		scrollPane_1.setViewportView(table_1);
+		
+		JLabel label_3 = new JLabel("");
+		label_3.setHorizontalAlignment(SwingConstants.CENTER);
+		label_3.setBounds(75, 0, 814, 98);
+		AllManagers.add(label_3);
+		
+		JLabel lblManagers = new JLabel("Managers");
+		lblManagers.setHorizontalAlignment(SwingConstants.CENTER);
+		lblManagers.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblManagers.setBounds(75, 139, 814, 25);
+		AllManagers.add(lblManagers);
+		
+		JButton button = new JButton("Logout");
+		button.setBounds(333, 632, 277, 25);
+		AllManagers.add(button);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
@@ -1614,6 +1674,41 @@ public class ClubReg {
 		}
 	}
 	/**
+	 * Adds all Managers to the table
+	 * @param id
+	 */
+	public void addManagersToTable()
+	{
+		modelManagers.setRowCount(0);
+		Connection con = null;
+		PreparedStatement selectStatement = null;
+		ResultSet result = null;
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `manager` ORDER by `Name`");
+			result = selectStatement.executeQuery();
+			int i = 0;
+			while (result.next()){
+				modelManagers.insertRow(i,new Object[]{result.getString(1),(result.getString(2)),(result.getString(3)),(result.getString(4)), ((result.getString(7)))});
+				i ++;
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null,"Problem adding managers to table.","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				result.close();
+			}catch(SQLException e){}
+			try{
+				selectStatement.close();
+			}catch(SQLException e){}
+			try{
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
+	/**
 	 * Check the login credentials of the officials
 	 * @throws InvalidKeySpecException 
 	 * @throws NoSuchAlgorithmException 
@@ -1640,6 +1735,7 @@ public class ClubReg {
 					case "Chairperson":
 						isChair = true;
 						addPlayersToTable(0);
+						addManagersToTable();
 						CardLayout cl = (CardLayout)(cards.getLayout());
 						cl.show(cards, CHAIRMAN);
 						backReception.setVisible(true);
