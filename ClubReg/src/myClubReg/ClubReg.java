@@ -19,9 +19,11 @@ import java.awt.GridBagLayout;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -62,9 +64,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JSeparator;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JScrollPane;
 import javax.swing.JPasswordField;
+
 import java.awt.SystemColor;
 
 
@@ -125,7 +129,6 @@ public class ClubReg {
 	private JLabel lblEditPlayerInformationManager;
 	private JLabel lblPlayerFirstnameManager;
 	private JTextField playerFNameFieldManager;
-	private JTextField playerSNameManager;
 	private JScrollPane scrollPane;
 	private JTable table;
 	private JButton btnLogoutManager;
@@ -148,7 +151,6 @@ public class ClubReg {
 	private JLabel lblCreateTeamName;
 	private JTextField createTeamNameField;
 	private JLabel createTeamMessage;
-	private JButton btnLogoutCreateTeam;
 	//Add manager
 	private JPanel addManager;
 	private JTextField newManagerName;
@@ -190,7 +192,6 @@ public class ClubReg {
 	private JTextField addOfficialUsernameField;
 	private JPasswordField addOfficialPasswordField;
 	private JButton createOfficialBtn;
-	private JButton createOfficialLogoutBtn;
 	private JComboBox<String> addOfficialPositionBox;
 	// Change password panel
 	private JTextField changePassUsernameField;
@@ -206,6 +207,11 @@ public class ClubReg {
 	private JTextField resetPassSurnameField;
 	private JPasswordField resetPassPasswordField;
 	private JButton btnResetUserPassword;
+	//Buttons only visible to chair
+	private JButton backReception;
+	private JButton backManager;
+	private JButton backAddManager;
+	private JButton backAddOfficial;
 
 	/**
 	 * Launch the application.
@@ -326,9 +332,10 @@ public class ClubReg {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				//Check if admin has logged in
-				if (userLoginField.getText().equalsIgnoreCase("admin")){
+				if (userLoginField.getText().trim().equalsIgnoreCase("admin")){
 					String password = new String(passLoginField.getPassword());
-					if(password.equalsIgnoreCase("clubregadmin")){
+					String trimPass = password.trim();
+					if(trimPass.equalsIgnoreCase("clubregadmin")){
 						CardLayout cl = (CardLayout)(cards.getLayout());
 						cl.show(cards, ADMIN);
 						userLoginField.setText("");
@@ -613,6 +620,17 @@ public class ClubReg {
 		btnLogoutRecep.setBounds(457, 632, 97, 25);
 		reception.add(btnLogoutRecep);
 
+		backReception = new JButton("Back");
+		backReception.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, CHAIRMAN);
+			}
+		});
+		backReception.setBounds(354, 632, 97, 25);
+		reception.add(backReception);
+		backReception.setVisible(false);
+
 		// Manager panel
 		manager = new JPanel();
 		manager.setBackground(Color.WHITE);
@@ -632,22 +650,13 @@ public class ClubReg {
 		manager.add(lblEditPlayerInformationManager);
 
 		lblPlayerFirstnameManager = new JLabel("Player Firstname");
-		lblPlayerFirstnameManager.setBounds(107, 172, 113, 16);
+		lblPlayerFirstnameManager.setBounds(313, 172, 113, 16);
 		manager.add(lblPlayerFirstnameManager);
 
 		playerFNameFieldManager = new JTextField();
-		playerFNameFieldManager.setBounds(242, 169, 220, 22);
+		playerFNameFieldManager.setBounds(448, 169, 220, 22);
 		manager.add(playerFNameFieldManager);
 		playerFNameFieldManager.setColumns(10);
-
-		JLabel lblPlayerSurname = new JLabel("Player Surname");
-		lblPlayerSurname.setBounds(483, 172, 113, 16);
-		manager.add(lblPlayerSurname);
-
-		playerSNameManager = new JTextField();
-		playerSNameManager.setBounds(600, 169, 220, 22);
-		manager.add(playerSNameManager);
-		playerSNameManager.setColumns(10);
 
 		JSeparator separator = new JSeparator();
 		separator.setBounds(75, 242, 814, 2);
@@ -659,9 +668,51 @@ public class ClubReg {
 		lblAllPlayers.setBounds(351, 257, 220, 16);
 		manager.add(lblAllPlayers);
 
-		JButton btnSave = new JButton("Save");
-		btnSave.setBounds(418, 204, 97, 25);
-		manager.add(btnSave);
+		// Create class to highlight row after search
+		class HighlightRenderer extends DefaultTableCellRenderer {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+				// everything as usual
+				super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+				//added behavior
+				if(row == table.getSelectedRow()) {
+
+					//customize that kind of border that will be use to highlight a row
+					setBorder(BorderFactory.createMatteBorder(2, 0, 2, 0, Color.RED));
+				}
+
+				return this;
+			}
+		}
+		JButton searchBtnManager = new JButton("Search");
+		searchBtnManager.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String value = playerFNameFieldManager.getText();
+				//Loop through each row to find the value in the first (name) column
+				for (int row = 0; row <= table.getRowCount() - 1; row++) {
+
+					if (value.equalsIgnoreCase((String) table.getValueAt(row, 0))) {
+
+						//automatically set the view of the scroll in the location of the value
+						table.scrollRectToVisible(table.getCellRect(row, 0, true));
+
+						// automatically set the focus of the searched/selected row/value
+						table.setRowSelectionInterval(row, row);
+
+						for (int i = 0; i <= table.getColumnCount() - 1; i++) {
+
+							table.getColumnModel().getColumn(i).setCellRenderer(new HighlightRenderer());
+						}
+					}
+				}
+			}
+		});
+		searchBtnManager.setBounds(418, 204, 97, 25);
+		manager.add(searchBtnManager);
 
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(75, 286, 814, 312);
@@ -706,6 +757,17 @@ public class ClubReg {
 		btnLogoutManager.setBounds(418, 615, 97, 25);
 		manager.add(btnLogoutManager);
 
+		backManager = new JButton("Back");
+		backManager.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, CHAIRMAN);
+			}
+		});
+		backManager.setBounds(309, 615, 97, 25);
+		manager.add(backManager);
+		backManager.setVisible(false);
+
 		// Setup create team screen
 		createTeam = new JPanel();
 		createTeam.setBackground(Color.WHITE);
@@ -728,7 +790,7 @@ public class ClubReg {
 				addTeam();
 			}
 		});
-		btnCreateTeam.setBounds(335, 260, 137, 25);
+		btnCreateTeam.setBounds(420, 260, 137, 25);
 		createTeam.add(btnCreateTeam);
 
 		createTeamNameField = new JTextField();
@@ -747,16 +809,6 @@ public class ClubReg {
 		lblTeamDetailsCreateTeam.setBounds(75, 128, 814, 16);
 		createTeam.add(lblTeamDetailsCreateTeam);
 
-		btnLogoutCreateTeam = new JButton("Logout");
-		btnLogoutCreateTeam.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				CardLayout cl = (CardLayout)(cards.getLayout());
-				cl.show(cards, LOGIN);
-			}
-		});
-		btnLogoutCreateTeam.setBounds(418, 570, 137, 25);
-		createTeam.add(btnLogoutCreateTeam);
-
 		btnBackCreateTeam = new JButton("Back");
 		btnBackCreateTeam.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -764,7 +816,7 @@ public class ClubReg {
 				cl.show(cards, CHAIRMAN);
 			}
 		});
-		btnBackCreateTeam.setBounds(532, 260, 137, 25);
+		btnBackCreateTeam.setBounds(420, 615, 137, 25);
 		createTeam.add(btnBackCreateTeam);
 
 		// Setup new manager screen
@@ -859,15 +911,15 @@ public class ClubReg {
 		newManagerCreateBtn.setBounds(336, 549, 309, 25);
 		addManager.add(newManagerCreateBtn);
 
-		JButton btnLogoutCreateManager = new JButton("Logout");
-		btnLogoutCreateManager.addActionListener(new ActionListener() {
+		backAddManager = new JButton("Back");
+		backAddManager.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout)(cards.getLayout());
-				cl.show(cards, LOGIN);
+				cl.show(cards, CHAIRMAN);
 			}
 		});
-		btnLogoutCreateManager.setBounds(444, 607, 97, 25);
-		addManager.add(btnLogoutCreateManager);
+		backAddManager.setBounds(442, 608, 97, 25);
+		addManager.add(backAddManager);
 		//Setup chairman screen
 		chairman = new JPanel();
 		chairman.setBackground(Color.WHITE);
@@ -1142,9 +1194,9 @@ public class ClubReg {
 		createOfficialBtn.setBounds(442, 480, 97, 25);
 		addOfficial.add(createOfficialBtn);
 
-		createOfficialLogoutBtn = new JButton("Logout");
-		createOfficialLogoutBtn.setBounds(442, 595, 97, 25);
-		addOfficial.add(createOfficialLogoutBtn);
+		backAddOfficial = new JButton("Back");
+		backAddOfficial.setBounds(442, 596, 97, 25);
+		addOfficial.add(backAddOfficial);
 		// Change password screen layout
 		JPanel changePassword = new JPanel();
 		changePassword.setBackground(Color.WHITE);
@@ -1334,12 +1386,12 @@ public class ClubReg {
 		if (pFNameFieldRecep.getText().equalsIgnoreCase("")){
 			parentName = "N/A";
 		}else{
-			parentName = pFNameFieldRecep.getText();
+			parentName = pFNameFieldRecep.getText().trim();
 		}
 		if (pSurnameFieldRecep.getText().equalsIgnoreCase("")){
 			parentSurname = "N/A";
 		}else{
-			parentSurname = pFNameFieldRecep.getText();
+			parentSurname = pFNameFieldRecep.getText().trim();
 		}
 		try {
 			//Initialize Connection and statements
@@ -1351,9 +1403,9 @@ public class ClubReg {
 			update.executeUpdate("INSERT INTO `s564387_clubreg`.`players` (`firstName`, `surname`, `status`, `houseNumber`, `dob`, `street`, `email`,"
 					+ " `townCity`, `phoneNumber`, `county`, `lastClub`, `lastLeague`, `parentFirstName`, `parentSurname`, `dateOfReg`, `feesPaid`,"
 					+ " `yellowCards`, `redCards`, `trainingAttended`, `goals`, `cleanSheets`, `imagePath`, `Team_ID`)"
-					+ " VALUES (('"+fNameFieldRecep.getText()+"'), ('"+sNameFieldRecep.getText()+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText()+"'),"
-					+ " ('"+pDOBFieldRecep.getText()+"'), ('"+pStreetFieldRecep.getText()+"'), ('"+PEmailFieldRecep.getText()+"'), ('"+pTownCityFieldRecep.getText()+"'), ('"+pContactRecep.getText()+"'),"
-					+ " ('"+pCountyRecepField.getText()+"'), ('"+pLastClubRecepField.getText()+"'), ('"+pLastLeagueFieldrecep.getText()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText()+"'),('"+teamID+"'));");
+					+ " VALUES (('"+fNameFieldRecep.getText().trim()+"'), ('"+sNameFieldRecep.getText().trim()+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText().trim()+"'),"
+					+ " ('"+pDOBFieldRecep.getText().trim()+"'), ('"+pStreetFieldRecep.getText().trim()+"'), ('"+PEmailFieldRecep.getText().trim()+"'), ('"+pTownCityFieldRecep.getText().trim()+"'), ('"+pContactRecep.getText().trim()+"'),"
+					+ " ('"+pCountyRecepField.getText().trim()+"'), ('"+pLastClubRecepField.getText().trim()+"'), ('"+pLastLeagueFieldrecep.getText().trim()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText().trim()+"'),('"+teamID+"'));");
 
 		} catch (SQLException e) {
 			//Show warning message
@@ -1561,11 +1613,14 @@ public class ClubReg {
 	{
 		for (int i = 0; i < officials.size(); i ++)
 		{
-			if (userLoginField.getText().equalsIgnoreCase(officials.get(i).getUsername()))
+			//Remove white spaces from userLogin
+			if (userLoginField.getText().trim().equalsIgnoreCase(officials.get(i).getUsername()))
 			{
 				String password = new String(passLoginField.getPassword());
+				//Remove white spaces from password
+				String trimPass = password.trim();
 				String passHash = officials.get(i).getPassword();
-				if(PasswordHash.validatePassword(password, passHash))
+				if(PasswordHash.validatePassword(trimPass, passHash))
 				{
 					found = true;
 					userLoginField.setText("");
@@ -1576,6 +1631,8 @@ public class ClubReg {
 					case "Chairperson":
 						CardLayout cl = (CardLayout)(cards.getLayout());
 						cl.show(cards, CHAIRMAN);
+						backReception.setVisible(true);
+						backManager.setVisible(true);
 						break;
 					case "Secretary":
 						CardLayout cl1 = (CardLayout)(cards.getLayout());
@@ -1598,11 +1655,14 @@ public class ClubReg {
 	{
 		for (int i = 0; i < managers.size(); i ++)
 		{
-			if (userLoginField.getText().equalsIgnoreCase(managers.get(i).getManagerUsername()))
+			//Remove white spaces from userLogin
+			if (userLoginField.getText().trim().equalsIgnoreCase(managers.get(i).getManagerUsername()))
 			{
 				String password = new String(passLoginField.getPassword());
+				//Remove white spaces from password
+				String passTrim = password.trim();
 				String passHash = managers.get(i).getmanagerPassword();
-				if(PasswordHash.validatePassword(password, passHash))
+				if(PasswordHash.validatePassword(passTrim, passHash))
 				{
 					found = true;
 					managerTeamID = managers.get(i).getManagerTeamID();
@@ -1641,6 +1701,8 @@ public class ClubReg {
 				update.executeUpdate(sql);
 				JOptionPane.showMessageDialog(null,"Team created. " + "Team name = " + team,"Missing info",2);
 				createTeamNameField.setText("");
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, ADD_MANAGER);
 			}
 			else{
 				JOptionPane.showMessageDialog(null,"No team name entered","Missing info",2);
