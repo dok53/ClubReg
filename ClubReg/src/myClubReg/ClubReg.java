@@ -82,7 +82,7 @@ public class ClubReg {
 	// Array lists with club products
 	String [] gear = {"Shorts", "Socks"};
 	String [] officialPositions = {"Chairperson","Secretary", "Treasurer" };
-	String [] columnNames = {"First name", "Surname", "Phone number", "Fees paid", "YC", "RC","Training", "Goals", "CS"};
+	String [] columnNames = {"Player ID ", "First name", "Surname", "Phone number", "Fees paid", "YC", "RC","Training", "Goals", "CS"};
 	String [] columnNamesManagers = {"Manager ID", "First name", "Surname", "Team"};
 	String [] columnNamesOfficials = {"Official ID", "First name", "Surname", "Position"};
 	String [] columnNamesTeams = {"Team ID", "Team name"};
@@ -246,6 +246,7 @@ public class ClubReg {
 	private JScrollPane scrollPane_3;
 	private JButton button_1;
 	private JTable table_3;
+	private JButton deletePlayer;
 
 	/**
 	 * Launch the application.
@@ -780,15 +781,18 @@ public class ClubReg {
 		//select column_name from information_schema.columns where table_name='players'.... fill array with this info
 		//table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Job No");
 		//table.getColumnModel().getColumn(0).setPreferredWidth(55);
-
-		for (int k = 0; k < 3; k++)
+		
+		//Set column widths and header values on table
+		table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Player_ID");
+		table.getColumnModel().getColumn(0).setPreferredWidth(55);
+		for (int k = 1; k < 4; k++)
 		{
 			table.getTableHeader().getColumnModel().getColumn(k).setHeaderValue(columnNames[k]);
-			table.getColumnModel().getColumn(k).setPreferredWidth(110);
+			table.getColumnModel().getColumn(k).setPreferredWidth(105);
 		}
-		for (int x  = 3; x < columnNames.length; x ++){
+		for (int x  = 4; x < columnNames.length; x ++){
 			table.getTableHeader().getColumnModel().getColumn(x).setHeaderValue(columnNames[x]);
-			table.getColumnModel().getColumn(x).setPreferredWidth(55);
+			table.getColumnModel().getColumn(x).setPreferredWidth(50);
 		}
 		scrollPane.setViewportView(table);
 
@@ -811,6 +815,37 @@ public class ClubReg {
 		});
 		backManager.setBounds(309, 615, 97, 25);
 		manager.add(backManager);
+		
+		deletePlayer = new JButton("Delete");
+		deletePlayer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String tableName = "players";
+				String officialType = "Player";
+				int selectedRowIndex = table.getSelectedRow();
+				int selectedColumnIndex = 0;
+				String selectedObject = (String) table.getModel().getValueAt(selectedRowIndex, selectedColumnIndex);
+				try {
+					deleteMember(tableName, officialType, Integer.parseInt(selectedObject));
+					int numRows = table.getSelectedRows().length;
+					for(int i=0; i<numRows ; i++ ) {
+
+					    model.removeRow(table.getSelectedRow());
+					}
+				} catch (NumberFormatException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (NoSuchAlgorithmException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (InvalidKeySpecException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		deletePlayer.setBounds(526, 615, 97, 25);
+		manager.add(deletePlayer);
+		deletePlayer.setVisible(false);
 		backManager.setVisible(false);
 
 		// Setup create team screen
@@ -1031,6 +1066,9 @@ public class ClubReg {
 		JButton btnLogoutChairman = new JButton("Logout");
 		btnLogoutChairman.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				backReception.setVisible(false);
+				backManager.setVisible(false);
+				deletePlayer.setVisible(false);
 				isChair = false;
 				CardLayout cl = (CardLayout)(cards.getLayout());
 				cl.show(cards, LOGIN);
@@ -1622,8 +1660,38 @@ public class ClubReg {
 				cl.show(cards, CHAIRMAN);
 			}
 		});
-		button_1.setBounds(449, 611, 97, 25);
+		button_1.setBounds(361, 618, 97, 25);
 		allTeams.add(button_1);
+		
+		JButton deleteTeam = new JButton("Delete");
+		deleteTeam.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String tableName = "teams";
+				String officialType = "Team";
+				int selectedRowIndex = table_3.getSelectedRow();
+				int selectedColumnIndex = 0;
+				String selectedObject = (String) table_3.getModel().getValueAt(selectedRowIndex, selectedColumnIndex);
+				try {
+					deleteMember(tableName, officialType, Integer.parseInt(selectedObject));
+					int numRows = table_3.getSelectedRows().length;
+					for(int i=0; i<numRows ; i++ ) {
+
+					    modelTeams.removeRow(table_3.getSelectedRow());
+					}
+				} catch (NumberFormatException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (NoSuchAlgorithmException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (InvalidKeySpecException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		deleteTeam.setBounds(490, 618, 97, 25);
+		allTeams.add(deleteTeam);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
@@ -1865,7 +1933,7 @@ public class ClubReg {
 			result = selectStatement.executeQuery();
 			int i = 0;
 			while (result.next()){
-				model.insertRow(i,new Object[]{result.getString(2),(result.getString(3)),(result.getString(10)),(result.getString(17)), ((result.getString(18))),
+				model.insertRow(i,new Object[]{result.getString(1),result.getString(2),(result.getString(3)),(result.getString(10)),(result.getString(17)), ((result.getString(18))),
 						((result.getString(19))),((result.getString(20))),result.getString(21),result.getString(22)});
 				i ++;
 			}
@@ -2021,6 +2089,7 @@ public class ClubReg {
 						cl.show(cards, CHAIRMAN);
 						backReception.setVisible(true);
 						backManager.setVisible(true);
+						deletePlayer.setVisible(true);
 						break;
 					case "Secretary":
 						CardLayout cl1 = (CardLayout)(cards.getLayout());
@@ -2207,7 +2276,6 @@ public class ClubReg {
 			for (Entry<String, Integer> entry : teamAndId.entrySet()){
 				if(teamNameID.equalsIgnoreCase(entry.getKey())){
 					teamID = entry.getValue();
-					System.out.println(teamID);
 				}
 			}
 			// check for empty fields
@@ -2268,9 +2336,7 @@ public class ClubReg {
 			insert = con.createStatement();
 			delete = con.createStatement();
 			String typeID = position + "_ID";
-					//String sql = "DELETE FROM `s564387_clubreg`."+tableName+" WHERE ('"+typeID+"') = ('"+id+"') ";
 					String sql = "DELETE FROM `"+tableName+"` WHERE `"+typeID+"` = '"+id+"'";
-					System.out.println(sql);
 					//Execute SQL statement
 					delete.executeUpdate(sql);
 					
