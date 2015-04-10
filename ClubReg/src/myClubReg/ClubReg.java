@@ -74,6 +74,10 @@ import javax.swing.JPasswordField;
 import java.awt.SystemColor;
 
 
+/**
+ * @author DOK
+ *
+ */
 public class ClubReg {
 	// Array lists with club products
 	String [] gear = {"Shorts", "Socks"};
@@ -93,6 +97,7 @@ public class ClubReg {
 	private JLabel passLogin;
 	private JLabel loginLogo;
 	private JTextField userLoginField;
+	private JLabel imageLoader;
 	//receptionist
 	private JPanel reception;
 	private JLabel recepHeader;
@@ -236,7 +241,7 @@ public class ClubReg {
 	private JButton btnOfficials;
 	private JPanel allTeams;
 	private JLabel label_5;
-	private JLabel label_6;
+	private JLabel lblTeams;
 	private JSeparator separator_3;
 	private JScrollPane scrollPane_3;
 	private JButton button_1;
@@ -361,6 +366,7 @@ public class ClubReg {
 		loginLogo.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				imageLoader.setVisible(false);
 				//Check if admin has logged in
 				if (userLoginField.getText().trim().equalsIgnoreCase("admin")){
 					String password = new String(passLoginField.getPassword());
@@ -377,6 +383,7 @@ public class ClubReg {
 					try {
 						managerLoginCheck();
 						officialLoginCheck();
+						//imageLoader.setVisible(false);
 					} catch (NoSuchAlgorithmException e1) {
 						JOptionPane.showMessageDialog(null, "Cannot login (loginInCheck mouseClicked)");
 						e1.printStackTrace();
@@ -412,6 +419,12 @@ public class ClubReg {
 		lblChangePassword.setHorizontalAlignment(SwingConstants.CENTER);
 		lblChangePassword.setBounds(341, 329, 239, 16);
 		login.add(lblChangePassword);
+		
+		imageLoader = new JLabel("");
+		imageLoader.setIcon(new ImageIcon("C:\\Users\\DOK\\Downloads\\ajax-loader.gif"));
+		imageLoader.setBounds(417, 466, 100, 104);
+		imageLoader.setVisible(false);
+		login.add(imageLoader);
 
 		//Setup the reception screen
 		reception = new JPanel();
@@ -1023,7 +1036,7 @@ public class ClubReg {
 				cl.show(cards, LOGIN);
 			}
 		});
-		btnLogoutChairman.setBounds(338, 607, 277, 25);
+		btnLogoutChairman.setBounds(526, 514, 277, 25);
 		chairman.add(btnLogoutChairman);
 
 		JButton btnCreateTeamChairman = new JButton("Create Team");
@@ -1063,7 +1076,7 @@ public class ClubReg {
 				cl.show(cards, RESET_PASSWORD);
 			}
 		});
-		btnResetUserPassword.setBounds(526, 448, 272, 25);
+		btnResetUserPassword.setBounds(164, 514, 272, 25);
 		chairman.add(btnResetUserPassword);
 		
 		btnOfficials = new JButton("Officials");
@@ -1073,7 +1086,7 @@ public class ClubReg {
 				cl.show(cards, ALL_OFFICIALS);
 			}
 		});
-		btnOfficials.setBounds(164, 499, 277, 25);
+		btnOfficials.setBounds(521, 448, 277, 25);
 		chairman.add(btnOfficials);
 		//Setup Admin panel
 		admin = new JPanel();
@@ -1250,6 +1263,12 @@ public class ClubReg {
 		addOfficial.add(createOfficialBtn);
 
 		backAddOfficial = new JButton("Back");
+		backAddOfficial.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout)(cards.getLayout());
+				cl.show(cards, CHAIRMAN);
+			}
+		});
 		backAddOfficial.setBounds(442, 596, 97, 25);
 		addOfficial.add(backAddOfficial);
 		// Change password screen layout
@@ -1458,8 +1477,38 @@ public class ClubReg {
 				cl.show(cards, CHAIRMAN);
 			}
 		});
-		backManagers.setBounds(449, 611, 97, 25);
+		backManagers.setBounds(357, 611, 97, 25);
 		AllManagers.add(backManagers);
+		
+		JButton btnDelete = new JButton("Delete");
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String tableName = "manager";
+				String officialType = "Manager";
+				int selectedRowIndex = table_1.getSelectedRow();
+				int selectedColumnIndex = 0;
+				String selectedObject = (String) table_1.getModel().getValueAt(selectedRowIndex, selectedColumnIndex);
+				try {
+					deleteMember(tableName, officialType, Integer.parseInt(selectedObject));
+					int numRows = table_1.getSelectedRows().length;
+					for(int i=0; i<numRows ; i++ ) {
+
+					    modelManagers.removeRow(table_1.getSelectedRow());
+					}
+				} catch (NumberFormatException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (NoSuchAlgorithmException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (InvalidKeySpecException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnDelete.setBounds(487, 611, 97, 25);
+		AllManagers.add(btnDelete);
 		
 		//All Officials screen layout
 		JPanel allOfficials = new JPanel();
@@ -1531,18 +1580,18 @@ public class ClubReg {
 		label_5.setBounds(75, 0, 814, 98);
 		allTeams.add(label_5);
 		
-		label_6 = new JLabel("Officials");
-		label_6.setHorizontalAlignment(SwingConstants.CENTER);
-		label_6.setFont(new Font("Tahoma", Font.BOLD, 15));
-		label_6.setBounds(75, 139, 814, 25);
-		allTeams.add(label_6);
+		lblTeams = new JLabel("Teams");
+		lblTeams.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTeams.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblTeams.setBounds(75, 139, 814, 25);
+		allTeams.add(lblTeams);
 		
 		separator_3 = new JSeparator();
 		separator_3.setBounds(83, 201, 814, 2);
 		allTeams.add(separator_3);
 		
 		scrollPane_3 = new JScrollPane();
-		scrollPane_3.setBackground(Color.WHITE);
+		scrollPane_3.getViewport().setBackground(Color.WHITE);
 		scrollPane_3.setBounds(83, 257, 814, 312);
 		allTeams.add(scrollPane_3);
 		//Set up table for teams
@@ -1559,7 +1608,6 @@ public class ClubReg {
 			}
 		};
 		table_3.setRowHeight(25);
-		table_3.setBackground(Color.WHITE);
 		for (int k = 0; k < columnNamesTeams.length; k++)
 		{
 			table_3.getTableHeader().getColumnModel().getColumn(k).setHeaderValue(columnNamesTeams[k]);
@@ -2187,6 +2235,50 @@ public class ClubReg {
 		} catch (SQLException e) {
 			//Show warning message
 			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add Manager","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//Close statement
+				insert.close();
+			}catch(SQLException e){}
+			try{
+				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
+	/**
+	 * Delete a member method
+	 * @param position
+	 * @param id
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 */
+	public void deleteMember(String tableName, String position, int id) throws NoSuchAlgorithmException, InvalidKeySpecException
+	{
+		//Initalize connection and statements
+		Connection con = null;
+		Statement insert = null;
+		Statement delete = null;
+		try {
+			//Initialize Connection and statements
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			insert = con.createStatement();
+			delete = con.createStatement();
+			String typeID = position + "_ID";
+					//String sql = "DELETE FROM `s564387_clubreg`."+tableName+" WHERE ('"+typeID+"') = ('"+id+"') ";
+					String sql = "DELETE FROM `"+tableName+"` WHERE `"+typeID+"` = '"+id+"'";
+					System.out.println(sql);
+					//Execute SQL statement
+					delete.executeUpdate(sql);
+					
+					JOptionPane.showMessageDialog(null,position + " deleted!","Missing info",2);
+				
+		} catch (SQLException e) {
+			//Show warning message
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot delete member","Missing info",2);
 			e.printStackTrace();
 		}
 		finally{
