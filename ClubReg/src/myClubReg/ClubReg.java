@@ -638,8 +638,13 @@ public class ClubReg {
 		btnSavePlayersRecord = new JButton("Save players record");
 		btnSavePlayersRecord.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				savePlayer();
-				clearRecepFields();
+				try {
+					savePlayer();
+					clearRecepFields();
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Cannot save player (actionPerformed)");
+					e1.printStackTrace();
+				}
 			}
 		});
 		btnSavePlayersRecord.setBounds(523, 578, 233, 25);
@@ -832,13 +837,13 @@ public class ClubReg {
 					    model.removeRow(table.getSelectedRow());
 					}
 				} catch (NumberFormatException e1) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Cannot delete player (actionPerformed NFE)");
 					e1.printStackTrace();
 				} catch (NoSuchAlgorithmException e1) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Cannot delete player (actionPerformed NSA)");
 					e1.printStackTrace();
 				} catch (InvalidKeySpecException e1) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Cannot delete player (actionPerformed IKS)");
 					e1.printStackTrace();
 				}
 			}
@@ -984,6 +989,10 @@ public class ClubReg {
 					e1.printStackTrace();
 				} catch (InvalidKeySpecException e1) {
 					JOptionPane.showMessageDialog(null, "Cannot add manager (Action performed)");
+					e1.printStackTrace();
+				} catch (Exception e1) {
+					//encryption exception
+					JOptionPane.showMessageDialog(null, "Cannot add manager (Action performed encryption)");
 					e1.printStackTrace();
 				}
 			}
@@ -1191,6 +1200,9 @@ public class ClubReg {
 				} catch (InvalidKeySpecException e1) {
 					JOptionPane.showMessageDialog(null, "Cannot add chairperson (action performed exception)");
 					e1.printStackTrace();
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Cannot add chairperson (action performed exception encryption)");
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -1293,6 +1305,10 @@ public class ClubReg {
 					e1.printStackTrace();
 				} catch (InvalidKeySpecException e1) {
 					JOptionPane.showMessageDialog(null, "Cannot add official (action performed)");
+					e1.printStackTrace();
+				} catch (Exception e1) {
+					//Encryption exception
+					JOptionPane.showMessageDialog(null, "Cannot add official (action performed encryption)");
 					e1.printStackTrace();
 				}
 			}
@@ -1534,13 +1550,13 @@ public class ClubReg {
 					    modelManagers.removeRow(table_1.getSelectedRow());
 					}
 				} catch (NumberFormatException e1) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Cannot delete manager (actionPerformed NFE)");
 					e1.printStackTrace();
 				} catch (NoSuchAlgorithmException e1) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Cannot delete manager (actionPerformed NSA)");
 					e1.printStackTrace();
 				} catch (InvalidKeySpecException e1) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Cannot delete manager (actionPerformed IKS)");
 					e1.printStackTrace();
 				}
 			}
@@ -1679,19 +1695,25 @@ public class ClubReg {
 					    modelTeams.removeRow(table_3.getSelectedRow());
 					}
 				} catch (NumberFormatException e1) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Cannot delete team (actionPerformed NFE)");
 					e1.printStackTrace();
 				} catch (NoSuchAlgorithmException e1) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Cannot delete team (actionPerformed NSA)");
 					e1.printStackTrace();
 				} catch (InvalidKeySpecException e1) {
-					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Cannot delete team (actionPerformed IKS)");
 					e1.printStackTrace();
 				}
 			}
 		});
 		deleteTeam.setBounds(490, 618, 97, 25);
 		allTeams.add(deleteTeam);
+		
+		JLabel lblWarningTeam = new JLabel("Please delete any manager or player associated with a team befor attempting to delete the team ");
+		lblWarningTeam.setFont(new Font("Tahoma", Font.BOLD, 13));
+		lblWarningTeam.setHorizontalAlignment(SwingConstants.CENTER);
+		lblWarningTeam.setBounds(93, 217, 796, 16);
+		allTeams.add(lblWarningTeam);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
@@ -1707,8 +1729,9 @@ public class ClubReg {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Methods for class
 	/**
 	 * Save a player to database
+	 * @throws Exception 
 	 */
-	public void savePlayer()
+	public void savePlayer() throws Exception
 	{
 		//Initalize connection and statements
 		Connection con = null;
@@ -1748,13 +1771,13 @@ public class ClubReg {
 			update.executeUpdate("INSERT INTO `s564387_clubreg`.`players` (`firstName`, `surname`, `status`, `houseNumber`, `dob`, `street`, `email`,"
 					+ " `townCity`, `phoneNumber`, `county`, `lastClub`, `lastLeague`, `parentFirstName`, `parentSurname`, `dateOfReg`, `feesPaid`,"
 					+ " `yellowCards`, `redCards`, `trainingAttended`, `goals`, `cleanSheets`, `imagePath`, `Team_ID`)"
-					+ " VALUES (('"+fNameFieldRecep.getText().trim()+"'), ('"+sNameFieldRecep.getText().trim()+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText().trim()+"'),"
-					+ " ('"+pDOBFieldRecep.getText().trim()+"'), ('"+pStreetFieldRecep.getText().trim()+"'), ('"+PEmailFieldRecep.getText().trim()+"'), ('"+pTownCityFieldRecep.getText().trim()+"'), ('"+pContactFieldRecep.getText().trim()+"'),"
+					+ " VALUES (('"+AES.encrypt(fNameFieldRecep.getText().trim())+"'), ('"+AES.encrypt(sNameFieldRecep.getText().trim())+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText().trim()+"'),"
+					+ " ('"+pDOBFieldRecep.getText().trim()+"'), ('"+pStreetFieldRecep.getText().trim()+"'), ('"+AES.encrypt(PEmailFieldRecep.getText().trim())+"'), ('"+pTownCityFieldRecep.getText().trim()+"'), ('"+pContactFieldRecep.getText().trim()+"'),"
 					+ " ('"+pCountyRecepField.getText().trim()+"'), ('"+pLastClubRecepField.getText().trim()+"'), ('"+pLastLeagueFieldrecep.getText().trim()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText().trim()+"'),('"+teamID+"'));");
 
 		} catch (SQLException e) {
 			//Show warning message
-			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot save player","Missing info",2);
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot save player","Error",2);
 			e.printStackTrace();
 		}
 		finally{
@@ -1805,8 +1828,9 @@ public class ClubReg {
 	}
 	/**
 	 * Method to fill ArrayList with all managers in database
+	 * @throws Exception 
 	 */
-	public void fillManagers()
+	public void fillManagers() throws Exception
 	{
 		//Declare Connection and Prepared statement for SQL
 		Connection con = null;
@@ -1820,7 +1844,7 @@ public class ClubReg {
 			ResultSet result = selectStatement.executeQuery();
 			while (result.next())
 			{
-				Manager manager = new Manager(result.getString(2), result.getString(3), result.getString(6), result.getString(5), result.getString(7));
+				Manager manager = new Manager(AES.decrypt(result.getString(2)), AES.decrypt(result.getString(3)), AES.decrypt(result.getString(6)), result.getString(5), result.getString(7));
 				managers.add(manager);
 			}
 		} catch (SQLException e) {
@@ -1840,8 +1864,9 @@ public class ClubReg {
 	}
 	/**
 	 * Method to fill ArrayList with all officials in database
+	 * @throws Exception 
 	 */
-	public void fillOfficials()
+	public void fillOfficials() throws Exception
 	{
 		//Declare Connection and Prepared statement for SQL
 		Connection con = null;
@@ -1855,7 +1880,7 @@ public class ClubReg {
 			ResultSet result = selectStatement.executeQuery();
 			while (result.next())
 			{
-				Official official = new Official(result.getString(2), result.getString(3), result.getString(4), result.getString(5), result.getString(6));
+				Official official = new Official(AES.decrypt(result.getString(2)), result.getString(3), result.getString(4), AES.decrypt(result.getString(5)), AES.decrypt(result.getString(6)));
 				officials.add(official);
 			}
 		} catch (SQLException e) {
@@ -1875,8 +1900,9 @@ public class ClubReg {
 	}
 	/**
 	 * Method to fill ArrayList with all players in database
+	 * @throws Exception 
 	 */
-	public void fillAllPlayers()
+	public void fillAllPlayers() throws Exception
 	{
 		//Declare Connection and Prepared statement for SQL
 		Connection con = null;
@@ -1891,8 +1917,8 @@ public class ClubReg {
 			while (result.next())
 			{
 				//Populate player array
-				Player player = new Player(result.getInt(24), result.getString(2), result.getString(3), result.getString(4), result.getString(5), result.getString(6),
-						result.getString(7), result.getString(8),result.getString(9), result.getString(10), result.getString(11), result.getString(12),
+				Player player = new Player(result.getInt(24), AES.decrypt(result.getString(2)), AES.decrypt(result.getString(3)), result.getString(4), result.getString(5), result.getString(6),
+						result.getString(7), AES.decrypt(result.getString(8)),result.getString(9), result.getString(10), result.getString(11), result.getString(12),
 						result.getString(13), result.getString(14), result.getString(15), result.getString(16), result.getInt(17), result.getInt(18),
 						result.getInt(19), result.getInt(20), result.getInt(21), result.getInt(22), result.getString(23));
 				players.add(player);
@@ -1915,8 +1941,9 @@ public class ClubReg {
 	/**
 	 * Adds all players to the table depending on the Id of the manager logged in
 	 * @param id
+	 * @throws Exception 
 	 */
-	public void addPlayersToTable(int id)
+	public void addPlayersToTable(int id) throws Exception
 	{
 		model.setRowCount(0);
 		Connection con = null;
@@ -1933,7 +1960,7 @@ public class ClubReg {
 			result = selectStatement.executeQuery();
 			int i = 0;
 			while (result.next()){
-				model.insertRow(i,new Object[]{result.getString(1),result.getString(2),(result.getString(3)),(result.getString(10)),(result.getString(17)), ((result.getString(18))),
+				model.insertRow(i,new Object[]{result.getString(1),AES.decrypt(result.getString(2)),(AES.decrypt(result.getString(3))),(result.getString(10)),(result.getString(17)), ((result.getString(18))),
 						((result.getString(19))),((result.getString(20))),result.getString(21),result.getString(22)});
 				i ++;
 			}
@@ -1955,8 +1982,9 @@ public class ClubReg {
 	}
 	/**
 	 * Adds all Managers to the table
+	 * @throws Exception 
 	 */
-	public void addManagersToTable()
+	public void addManagersToTable() throws Exception
 	{
 		modelManagers.setRowCount(0);
 		Connection con = null;
@@ -1968,7 +1996,7 @@ public class ClubReg {
 			result = selectStatement.executeQuery();
 			int i = 0;
 			while (result.next()){
-				modelManagers.insertRow(i,new Object[]{result.getString(1),(result.getString(2)),(result.getString(3)),(result.getString(4)), ((result.getString(7)))});
+				modelManagers.insertRow(i,new Object[]{result.getString(1),(AES.decrypt(result.getString(2))),(AES.decrypt(result.getString(3))),(result.getString(4))});
 				i ++;
 			}
 		} catch (SQLException e) {
@@ -1989,8 +2017,9 @@ public class ClubReg {
 	}
 	/**
 	 * Adds all Officials to the table
+	 * @throws Exception 
 	 */
-	public void addOfficialsToTable()
+	public void addOfficialsToTable() throws Exception
 	{
 		modelOfficials.setRowCount(0);
 		Connection con = null;
@@ -2002,7 +2031,7 @@ public class ClubReg {
 			result = selectStatement.executeQuery();
 			int i = 0;
 			while (result.next()){
-				modelOfficials.insertRow(i,new Object[]{result.getString(1),(result.getString(5)),(result.getString(6)),(result.getString(4))});
+				modelOfficials.insertRow(i,new Object[]{result.getString(1),(AES.decrypt(result.getString(5))),(AES.decrypt(result.getString(6))),(result.getString(4))});
 				i ++;
 			}
 		} catch (SQLException e) {
@@ -2081,9 +2110,14 @@ public class ClubReg {
 					switch (position){
 					case "Chairperson":
 						isChair = true;
-						addPlayersToTable(0);
-						addManagersToTable();
-						addOfficialsToTable();
+						try {
+							addOfficialsToTable();
+							addPlayersToTable(0);
+							addManagersToTable();
+						} catch (Exception e) {
+							JOptionPane.showMessageDialog(null, "Cannot add players/managers/officials to table officialLogin");
+							e.printStackTrace();
+						}
 						addTeamsToTable();
 						CardLayout cl = (CardLayout)(cards.getLayout());
 						cl.show(cards, CHAIRMAN);
@@ -2128,7 +2162,12 @@ public class ClubReg {
 					CardLayout cl = (CardLayout)(cards.getLayout());
 					cl.show(cards, MANAGER);
 					//Add appropriate players to table
-					addPlayersToTable(Integer.parseInt(managerTeamID));
+					try {
+						addPlayersToTable(Integer.parseInt(managerTeamID));
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null, "Cannot add players to table managerLogin");
+						e.printStackTrace();
+					}
 				}
 				else{
 					//put in counter after managers and officials to see if there all looped through
@@ -2156,7 +2195,7 @@ public class ClubReg {
 			if (team.length() > 1){
 				String sql = "INSERT INTO `s564387_clubreg`.`teams` (`Team_ID`, `TeamName`) VALUES (NULL, ('"+team+"'))";
 				update.executeUpdate(sql);
-				JOptionPane.showMessageDialog(null,"Team created. " + "Team name = " + team,"Missing info",2);
+				JOptionPane.showMessageDialog(null,"Team created. " + "Team name = " + team,"Success",2);
 				createTeamNameField.setText("");
 				//Remove all elements from the team comboBox
 				DefaultComboBoxModel<String> theModel = (DefaultComboBoxModel<String>)newManagerTeamIDBox.getModel();
@@ -2177,7 +2216,7 @@ public class ClubReg {
 			}
 		} catch (SQLException e) {
 			//Show warning message
-			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add team","Missing info",2);
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add team","Error",2);
 			e.printStackTrace();
 		}
 		finally{
@@ -2193,10 +2232,9 @@ public class ClubReg {
 	}
 	/**
 	 * Add chairperson to database when admin logs in first time
-	 * @throws InvalidKeySpecException 
-	 * @throws NoSuchAlgorithmException 
+	 * @throws Exception 
 	 */
-	public void addChairperson() throws NoSuchAlgorithmException, InvalidKeySpecException
+	public void addChairperson() throws Exception
 	{
 		//Initalize connection and statements
 		Connection con = null;
@@ -2217,21 +2255,22 @@ public class ClubReg {
 			//Check if any fields are blank
 			if (name.length() > 1 && surname.length() > 1 && username.length() > 1 && password.length() > 1 && position.length() > 0){
 				String sql = "INSERT INTO `s564387_clubreg`.`officials` (`Official_ID`, `username`, `password`,`position`,`name`,`surname`)"
-						+ " VALUES (NULL, ('"+username+"'),('"+passHash+"'),('"+position+"'),('"+name+"'),('"+surname+"') )";
+						+ " VALUES (NULL, ('"+AES.encrypt(username)+"'),('"+passHash+"'),('"+position+"'),('"+AES.encrypt(name)+"'),('"+AES.encrypt(surname)+"') )";
 				//Execute SQL statement
 				update.executeUpdate(sql);
 				chairpersonUsernameField.setText("");
 				chairpersonPasswordField.setText("");
 				chairpersonNameField.setText("");
 				chairpersonSurnameField.setText("");
-				JOptionPane.showMessageDialog(null,"Chairperson added!","Missing info",2);
+				fillOfficials();
+				JOptionPane.showMessageDialog(null,"Chairperson added!","Success",2);
 			}
 			else{
 				JOptionPane.showMessageDialog(null, "Missing fields!!");
 			}
 		} catch (SQLException e) {
 			//Show warning message
-			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add chairperson","Missing info",2);
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add chairperson","Error",2);
 			e.printStackTrace();
 		}
 		finally{
@@ -2247,10 +2286,9 @@ public class ClubReg {
 	}
 	/**
 	 * Add Manager method
-	 * @throws InvalidKeySpecException 
-	 * @throws NoSuchAlgorithmException 
+	 * @throws Exception 
 	 */
-	public void addManager() throws NoSuchAlgorithmException, InvalidKeySpecException
+	public void addManager() throws Exception
 	{
 		//Initalize connection and statements
 		Connection con = null;
@@ -2286,7 +2324,7 @@ public class ClubReg {
 				}
 				else{
 					String sql = "INSERT INTO `s564387_clubreg`.`manager` (`Manager_ID`, `Name`, `Surname`, `Team`, `password`, `username`, `Team_ID`) "
-							+ "VALUES (NULL, ('"+name+"'), ('"+surname+"'), ('"+team+"'), ('"+passHash+"'), ('"+username+"'), ('"+teamID+"'))";
+							+ "VALUES (NULL, ('"+AES.encrypt(name)+"'), ('"+AES.encrypt(surname)+"'), ('"+team+"'), ('"+passHash+"'), ('"+AES.encrypt(username)+"'), ('"+teamID+"'))";
 					//Execute SQL statement
 					update.executeUpdate(sql);
 					newManagerName.setText("");
@@ -2294,7 +2332,7 @@ public class ClubReg {
 					newManagerUsername.setText("");
 					newManagerPassword.setText("");
 					newManagerTeamName.setText("");
-					JOptionPane.showMessageDialog(null,"Manager added!","Missing info",2);
+					JOptionPane.showMessageDialog(null,"Manager added!","Success",2);
 				}
 			}
 			else{
@@ -2302,7 +2340,7 @@ public class ClubReg {
 			}
 		} catch (SQLException e) {
 			//Show warning message
-			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add Manager","Missing info",2);
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add Manager","Error",2);
 			e.printStackTrace();
 		}
 		finally{
@@ -2340,11 +2378,11 @@ public class ClubReg {
 					//Execute SQL statement
 					delete.executeUpdate(sql);
 					
-					JOptionPane.showMessageDialog(null,position + " deleted!","Missing info",2);
+					JOptionPane.showMessageDialog(null,position + " deleted!","Success",2);
 				
 		} catch (SQLException e) {
 			//Show warning message
-			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot delete member","Missing info",2);
+			JOptionPane.showMessageDialog(null,"Database error. Delete managers and players before team","Error",2);
 			e.printStackTrace();
 		}
 		finally{
@@ -2360,10 +2398,9 @@ public class ClubReg {
 	}
 	/**
 	 * Method to create official at the club
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
+	 * @throws Exception 
 	 */
-	public void createOfficial() throws NoSuchAlgorithmException, InvalidKeySpecException
+	public void createOfficial() throws Exception
 	{
 		//Initalize connection and statements
 		Connection con = null;
@@ -2385,8 +2422,9 @@ public class ClubReg {
 			if (name.length() > 1 && surname.length() > 1 && username.length() > 1 && password.length() > 1){
 				if(!position.equalsIgnoreCase("position")){
 					String sql = "INSERT INTO `s564387_clubreg`.`officials` (`Official_ID`, `Name`, `Surname`, `password`, `username`, `position`) "
-							+ "VALUES (NULL, ('"+name+"'), ('"+surname+"'), ('"+passHash+"'),('"+username+"'), ('"+position+"'))";
+							+ "VALUES (NULL, ('"+AES.encrypt(name)+"'), ('"+AES.encrypt(surname)+"'), ('"+passHash+"'),('"+AES.encrypt(username)+"'), ('"+position+"'))";
 					//Execute SQL statement
+					System.out.println(sql);
 					update.executeUpdate(sql);
 					addOfficialNameField.setText("");
 					addOfficialSurnameField.setText("");
@@ -2394,7 +2432,7 @@ public class ClubReg {
 					addOfficialPasswordField.setText("");
 					addOfficialPositionBox.setSelectedIndex(0);
 
-					JOptionPane.showMessageDialog(null,position + " added!","Missing info",2);
+					JOptionPane.showMessageDialog(null,position + " added!","Success",2);
 				}
 				else{
 					JOptionPane.showMessageDialog(null,"You must select a position!","Missing info",2);
@@ -2405,7 +2443,7 @@ public class ClubReg {
 			}
 		} catch (SQLException e) {
 			//Show warning message
-			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add Official","Missing info",2);
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot add Official","Error",2);
 			e.printStackTrace();
 		}
 		finally{
@@ -2517,7 +2555,7 @@ public class ClubReg {
 		}
 		catch (SQLException e) {
 			//Show warning message
-			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot change password","Missing info",2);
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot change password","Error",2);
 			e.printStackTrace();
 		}
 		finally{
@@ -2596,7 +2634,7 @@ public class ClubReg {
 		}
 		catch (SQLException e) {
 			//Show warning message
-			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot reset password","Missing info",2);
+			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot reset password","Error",2);
 			e.printStackTrace();
 		}
 		finally{
