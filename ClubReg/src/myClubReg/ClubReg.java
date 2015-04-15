@@ -158,6 +158,7 @@ public class ClubReg {
 	final private String ALL_MANAGERS = "All managers panel";
 	final private String ALL_OFFICIALS = "All officials panel";
 	final private String ALL_TEAMS = "All teams panel";
+	final private String EDIT_PLAYER = "Edit player panel panel";
 	private JLabel lblAllPlayers;
 	//Create team
 	private JPanel createTeam;
@@ -232,6 +233,7 @@ public class ClubReg {
 	private JButton backAddOfficial;
 	//set to true if chairperson is logged in
 	private boolean isChair = false;
+	//Chair all managers panel and table
 	private JPanel AllManagers;
 	private JTable table_1;
 	private JLabel label_4;
@@ -241,6 +243,7 @@ public class ClubReg {
 	private JButton button;
 	private JTable table_2;
 	private JButton btnOfficials;
+	//Chair all teams panel and table
 	private JPanel allTeams;
 	private JLabel label_5;
 	private JLabel lblTeams;
@@ -249,6 +252,22 @@ public class ClubReg {
 	private JButton button_1;
 	private JTable table_3;
 	private JButton deletePlayer;
+	//Edit manager panel
+	private JPanel managerEdit;
+	private JTextField nameEditPlayerField;
+	private JTextField surnameEditPlayerField;
+	private JTextField feesEditPlayerField;
+	private JTextField yellowsEditPlayerField;
+	private JLabel lblRedCards;
+	private JTextField redsEditPlayerField;
+	private JLabel lblTraining;
+	private JTextField trainingEditPlayerField;
+	private JLabel lblGoals;
+	private JTextField goalsEditPlayerField;
+	private JTextField cleanSheetsEditPlayerField;
+	private JLabel lblCleanSheets;
+	private JButton btnSave;
+	private JButton btnBack_1;
 
 	/**
 	 * Launch the application.
@@ -805,6 +824,27 @@ public class ClubReg {
 			table.getTableHeader().getColumnModel().getColumn(x).setHeaderValue(columnNames[x]);
 			table.getColumnModel().getColumn(x).setPreferredWidth(50);
 		}
+		table.addMouseListener(new MouseAdapter(){
+			public void mouseClicked (MouseEvent e){
+				if (e.getClickCount() == 2){
+					JTable target = (JTable)e.getSource();
+					int rowSelected = target.getSelectedRow();
+					if (table.getSelectedRow() > -1){
+						CardLayout cl = (CardLayout) (cards.getLayout());
+						cl.show(cards, EDIT_PLAYER);
+						nameEditPlayerField.setText(table.getValueAt(rowSelected, 1).toString());
+						surnameEditPlayerField.setText(table.getValueAt(rowSelected, 2).toString());
+						feesEditPlayerField.setText(table.getValueAt(rowSelected, 4).toString());
+						yellowsEditPlayerField.setText(table.getValueAt(rowSelected, 5).toString());
+						redsEditPlayerField.setText(table.getValueAt(rowSelected, 6).toString());
+						trainingEditPlayerField.setText(table.getValueAt(rowSelected,7).toString());
+						goalsEditPlayerField.setText(table.getValueAt(rowSelected, 8).toString());
+						cleanSheetsEditPlayerField.setText(table.getValueAt(rowSelected, 9).toString());
+						
+					}
+				}
+			}
+		});
 		scrollPane.setViewportView(table);
 
 		btnLogoutManager = new JButton("Logout");
@@ -1720,6 +1760,113 @@ public class ClubReg {
 		lblWarningTeam.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWarningTeam.setBounds(93, 217, 796, 16);
 		allTeams.add(lblWarningTeam);
+		
+		managerEdit = new JPanel();
+		managerEdit.setBackground(Color.WHITE);
+		cards.add(managerEdit, EDIT_PLAYER);
+		managerEdit.setLayout(null);
+		
+		JLabel label_6 = new JLabel("");
+		label_6.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
+		label_6.setHorizontalAlignment(SwingConstants.CENTER);
+		label_6.setBounds(75, 0, 814, 98);
+		managerEdit.add(label_6);
+		
+		JLabel editPlayer = new JLabel("Edit Player");
+		editPlayer.setHorizontalAlignment(SwingConstants.CENTER);
+		editPlayer.setFont(new Font("Tahoma", Font.BOLD, 15));
+		editPlayer.setBounds(75, 125, 791, 16);
+		managerEdit.add(editPlayer);
+		
+		JButton button_2 = new JButton("Logout");
+		button_2.setBounds(428, 632, 97, 25);
+		managerEdit.add(button_2);
+		
+		JLabel lblName_1 = new JLabel("Name");
+		lblName_1.setBounds(177, 192, 82, 16);
+		managerEdit.add(lblName_1);
+		
+		nameEditPlayerField = new JTextField();
+		nameEditPlayerField.setBounds(271, 189, 200, 22);
+		managerEdit.add(nameEditPlayerField);
+		nameEditPlayerField.setColumns(10);
+		
+		JLabel lblSurname_2 = new JLabel("Surname");
+		lblSurname_2.setBounds(502, 192, 88, 16);
+		managerEdit.add(lblSurname_2);
+		
+		surnameEditPlayerField = new JTextField();
+		surnameEditPlayerField.setBounds(577, 189, 200, 22);
+		managerEdit.add(surnameEditPlayerField);
+		surnameEditPlayerField.setColumns(10);
+		
+		JLabel lblFeesPaid = new JLabel("Fees paid");
+		lblFeesPaid.setBounds(502, 292, 70, 16);
+		managerEdit.add(lblFeesPaid);
+		
+		feesEditPlayerField = new JTextField();
+		feesEditPlayerField.setBounds(577, 289, 200, 22);
+		managerEdit.add(feesEditPlayerField);
+		feesEditPlayerField.setColumns(10);
+		
+		JLabel lblYellowCards = new JLabel("Yellow cards");
+		lblYellowCards.setBounds(177, 295, 82, 16);
+		managerEdit.add(lblYellowCards);
+		
+		yellowsEditPlayerField = new JTextField();
+		yellowsEditPlayerField.setBounds(271, 292, 200, 22);
+		managerEdit.add(yellowsEditPlayerField);
+		yellowsEditPlayerField.setColumns(10);
+		
+		lblRedCards = new JLabel("Red cards");
+		lblRedCards.setBounds(500, 343, 65, 16);
+		managerEdit.add(lblRedCards);
+		
+		redsEditPlayerField = new JTextField();
+		redsEditPlayerField.setBounds(577, 340, 200, 22);
+		managerEdit.add(redsEditPlayerField);
+		redsEditPlayerField.setColumns(10);
+		
+		lblTraining = new JLabel("Training");
+		lblTraining.setBounds(502, 241, 58, 16);
+		managerEdit.add(lblTraining);
+		
+		trainingEditPlayerField = new JTextField();
+		trainingEditPlayerField.setBounds(577, 238, 200, 22);
+		managerEdit.add(trainingEditPlayerField);
+		trainingEditPlayerField.setColumns(10);
+		
+		lblGoals = new JLabel("Goals");
+		lblGoals.setBounds(177, 241, 56, 16);
+		managerEdit.add(lblGoals);
+		
+		goalsEditPlayerField = new JTextField();
+		goalsEditPlayerField.setBounds(271, 238, 200, 22);
+		managerEdit.add(goalsEditPlayerField);
+		goalsEditPlayerField.setColumns(10);
+		
+		cleanSheetsEditPlayerField = new JTextField();
+		cleanSheetsEditPlayerField.setBounds(271, 340, 200, 22);
+		managerEdit.add(cleanSheetsEditPlayerField);
+		cleanSheetsEditPlayerField.setColumns(10);
+		
+		lblCleanSheets = new JLabel("Clean sheets");
+		lblCleanSheets.setBounds(177, 343, 74, 16);
+		managerEdit.add(lblCleanSheets);
+		
+		btnSave = new JButton("Save");
+		btnSave.setBounds(507, 420, 97, 25);
+		managerEdit.add(btnSave);
+		
+		btnBack_1 = new JButton("Back");
+		btnBack_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) (cards.getLayout());
+				cl.show(cards, MANAGER);
+			}
+		});
+		btnBack_1.setBounds(395, 420, 97, 25);
+		managerEdit.add(btnBack_1);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
