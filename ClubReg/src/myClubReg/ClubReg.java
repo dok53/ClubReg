@@ -30,6 +30,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 import java.awt.Color;
@@ -268,6 +269,7 @@ public class ClubReg {
 	private JLabel lblCleanSheets;
 	private JButton btnSave;
 	private JButton btnBack_1;
+	private JTextField playerIdEditPlayerField;
 
 	/**
 	 * Launch the application.
@@ -769,10 +771,10 @@ public class ClubReg {
 				//Loop through each row to find the value in the first (name) column
 				for (int row = 0; row <= table.getRowCount() - 1; row++) {
 
-					if (value.equalsIgnoreCase((String) table.getValueAt(row, 0))) {
+					if (value.equalsIgnoreCase((String) table.getValueAt(row, 1))) {
 
 						//automatically set the view of the scroll in the location of the value
-						table.scrollRectToVisible(table.getCellRect(row, 0, true));
+						table.scrollRectToVisible(table.getCellRect(row, 1, true));
 
 						// automatically set the focus of the searched/selected row/value
 						table.setRowSelectionInterval(row, row);
@@ -806,11 +808,9 @@ public class ClubReg {
 			}
 		};
 		table.setRowHeight(25);
+		//Only allow single row selection
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		//Get column names SQL
-		//select column_name from information_schema.columns where table_name='players'.... fill array with this info
-		//table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Job No");
-		//table.getColumnModel().getColumn(0).setPreferredWidth(55);
 
 		//Set column widths and header values on table
 		table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Player_ID");
@@ -832,6 +832,7 @@ public class ClubReg {
 					if (table.getSelectedRow() > -1){
 						CardLayout cl = (CardLayout) (cards.getLayout());
 						cl.show(cards, EDIT_PLAYER);
+						playerIdEditPlayerField.setText(table.getValueAt(rowSelected, 0).toString());
 						nameEditPlayerField.setText(table.getValueAt(rowSelected, 1).toString());
 						surnameEditPlayerField.setText(table.getValueAt(rowSelected, 2).toString());
 						feesEditPlayerField.setText(table.getValueAt(rowSelected, 4).toString());
@@ -1532,7 +1533,7 @@ public class ClubReg {
 		scrollPane_1.setBounds(83, 257, 814, 312);
 		scrollPane_1.getViewport().setBackground(Color.WHITE);
 		AllManagers.add(scrollPane_1);
-
+		
 		table_1 = new JTable(modelManagers)
 		{
 			/**
@@ -1545,6 +1546,8 @@ public class ClubReg {
 				return false;
 			}
 		};
+		//Only allow single row selection
+		table_1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table_1.setRowHeight(25);
 		table_1.setBackground(Color.WHITE);
 		for (int k = 0; k <columnNamesManagers.length; k++)
@@ -1651,6 +1654,8 @@ public class ClubReg {
 			}
 		};
 		table_2.setRowHeight(25);
+		//Only allow single row selection
+		table_2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table_2.setBackground(Color.WHITE);
 		for (int k = 0; k < columnNamesOfficials.length; k++)
 		{
@@ -1708,6 +1713,8 @@ public class ClubReg {
 			}
 		};
 		table_3.setRowHeight(25);
+		//Only allow single row selection
+		table_3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		for (int k = 0; k < columnNamesTeams.length; k++)
 		{
 			table_3.getTableHeader().getColumnModel().getColumn(k).setHeaderValue(columnNamesTeams[k]);
@@ -1783,79 +1790,94 @@ public class ClubReg {
 		managerEdit.add(button_2);
 		
 		JLabel lblName_1 = new JLabel("Name");
-		lblName_1.setBounds(177, 192, 82, 16);
+		lblName_1.setBounds(178, 207, 82, 16);
 		managerEdit.add(lblName_1);
 		
 		nameEditPlayerField = new JTextField();
-		nameEditPlayerField.setBounds(271, 189, 200, 22);
+		nameEditPlayerField.setEditable(false);
+		nameEditPlayerField.setBounds(272, 204, 200, 22);
 		managerEdit.add(nameEditPlayerField);
 		nameEditPlayerField.setColumns(10);
 		
 		JLabel lblSurname_2 = new JLabel("Surname");
-		lblSurname_2.setBounds(502, 192, 88, 16);
+		lblSurname_2.setBounds(503, 207, 70, 16);
 		managerEdit.add(lblSurname_2);
 		
 		surnameEditPlayerField = new JTextField();
-		surnameEditPlayerField.setBounds(577, 189, 200, 22);
+		surnameEditPlayerField.setEditable(false);
+		surnameEditPlayerField.setBounds(578, 204, 200, 22);
 		managerEdit.add(surnameEditPlayerField);
 		surnameEditPlayerField.setColumns(10);
 		
 		JLabel lblFeesPaid = new JLabel("Fees paid");
-		lblFeesPaid.setBounds(502, 292, 70, 16);
+		lblFeesPaid.setBounds(503, 307, 70, 16);
 		managerEdit.add(lblFeesPaid);
 		
 		feesEditPlayerField = new JTextField();
-		feesEditPlayerField.setBounds(577, 289, 200, 22);
+		feesEditPlayerField.setBounds(578, 304, 200, 22);
 		managerEdit.add(feesEditPlayerField);
 		feesEditPlayerField.setColumns(10);
 		
 		JLabel lblYellowCards = new JLabel("Yellow cards");
-		lblYellowCards.setBounds(177, 295, 82, 16);
+		lblYellowCards.setBounds(178, 310, 82, 16);
 		managerEdit.add(lblYellowCards);
 		
 		yellowsEditPlayerField = new JTextField();
-		yellowsEditPlayerField.setBounds(271, 292, 200, 22);
+		yellowsEditPlayerField.setBounds(272, 307, 200, 22);
 		managerEdit.add(yellowsEditPlayerField);
 		yellowsEditPlayerField.setColumns(10);
 		
 		lblRedCards = new JLabel("Red cards");
-		lblRedCards.setBounds(500, 343, 65, 16);
+		lblRedCards.setBounds(501, 358, 65, 16);
 		managerEdit.add(lblRedCards);
 		
 		redsEditPlayerField = new JTextField();
-		redsEditPlayerField.setBounds(577, 340, 200, 22);
+		redsEditPlayerField.setBounds(578, 355, 200, 22);
 		managerEdit.add(redsEditPlayerField);
 		redsEditPlayerField.setColumns(10);
 		
 		lblTraining = new JLabel("Training");
-		lblTraining.setBounds(502, 241, 58, 16);
+		lblTraining.setBounds(503, 256, 58, 16);
 		managerEdit.add(lblTraining);
 		
 		trainingEditPlayerField = new JTextField();
-		trainingEditPlayerField.setBounds(577, 238, 200, 22);
+		trainingEditPlayerField.setBounds(578, 253, 200, 22);
 		managerEdit.add(trainingEditPlayerField);
 		trainingEditPlayerField.setColumns(10);
 		
 		lblGoals = new JLabel("Goals");
-		lblGoals.setBounds(177, 241, 56, 16);
+		lblGoals.setBounds(178, 256, 56, 16);
 		managerEdit.add(lblGoals);
 		
 		goalsEditPlayerField = new JTextField();
-		goalsEditPlayerField.setBounds(271, 238, 200, 22);
+		goalsEditPlayerField.setBounds(272, 253, 200, 22);
 		managerEdit.add(goalsEditPlayerField);
 		goalsEditPlayerField.setColumns(10);
 		
 		cleanSheetsEditPlayerField = new JTextField();
-		cleanSheetsEditPlayerField.setBounds(271, 340, 200, 22);
+		cleanSheetsEditPlayerField.setBounds(272, 355, 200, 22);
 		managerEdit.add(cleanSheetsEditPlayerField);
 		cleanSheetsEditPlayerField.setColumns(10);
 		
 		lblCleanSheets = new JLabel("Clean sheets");
-		lblCleanSheets.setBounds(177, 343, 74, 16);
+		lblCleanSheets.setBounds(178, 358, 74, 16);
 		managerEdit.add(lblCleanSheets);
 		
 		btnSave = new JButton("Save");
-		btnSave.setBounds(507, 420, 97, 25);
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					editPlayer();
+				} catch (NoSuchAlgorithmException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot edit player (ActionPerformed)");
+					e1.printStackTrace();
+				} catch (InvalidKeySpecException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot edit player (ActionPerformed)");
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnSave.setBounds(508, 435, 97, 25);
 		managerEdit.add(btnSave);
 		
 		btnBack_1 = new JButton("Back");
@@ -1865,8 +1887,18 @@ public class ClubReg {
 				cl.show(cards, MANAGER);
 			}
 		});
-		btnBack_1.setBounds(395, 420, 97, 25);
+		btnBack_1.setBounds(396, 435, 97, 25);
 		managerEdit.add(btnBack_1);
+		
+		playerIdEditPlayerField = new JTextField();
+		playerIdEditPlayerField.setEditable(false);
+		playerIdEditPlayerField.setBounds(489, 169, 116, 22);
+		managerEdit.add(playerIdEditPlayerField);
+		playerIdEditPlayerField.setColumns(10);
+		
+		JLabel lblPlayerId = new JLabel("Player ID");
+		lblPlayerId.setBounds(381, 169, 91, 22);
+		managerEdit.add(lblPlayerId);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
@@ -2557,6 +2589,7 @@ public class ClubReg {
 			}catch(SQLException e){}
 		}
 	}
+	
 	/**
 	 * Method to create official at the club
 	 * @throws Exception 
@@ -2737,7 +2770,59 @@ public class ClubReg {
 	public void setManagerTeamID(String managerTeamID) {
 		this.managerTeamID = managerTeamID;
 	}
+	/**
+	 * Edit player method
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeySpecException
+	 */
+	public void editPlayer() throws NoSuchAlgorithmException, InvalidKeySpecException
+	{
+		//Initalize connection and statements
+		Connection con = null;
+		Statement update = null;
+		try {
+			//Initialize Connection and statements
+			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");
+			int id = Integer.parseInt(playerIdEditPlayerField.getText());
+			int fees = Integer.parseInt(feesEditPlayerField.getText());
+			int yellows = Integer.parseInt(yellowsEditPlayerField.getText());
+			int reds = Integer.parseInt(redsEditPlayerField.getText());
+			int training = Integer.parseInt(trainingEditPlayerField.getText());
+			int goals = Integer.parseInt(goalsEditPlayerField.getText());
+			int cs = Integer.parseInt(cleanSheetsEditPlayerField.getText());
+			
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+			update = con.createStatement();
+			update.executeUpdate("UPDATE `players` SET `feesPaid`= ('"+fees+"'),`yellowCards`=('"+yellows+"'),`redCards`=('"+reds+"'),`yellowCards`=('"+yellows+"'),"
+					+ "`trainingAttended`=('"+training+"'),`goals`=('"+goals+"'),`cleanSheets`=('"+cs+"') WHERE `Player_ID`=('"+id+"')");
 
+			JOptionPane.showMessageDialog(null,"Player updated","Success",2);
+			int managerID = Integer.parseInt(managerTeamID);
+			try {
+				addPlayersToTable(managerID);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			CardLayout cl = (CardLayout) (cards.getLayout());
+			cl.show(cards, MANAGER);
+
+		} catch (SQLException e) {
+			//Show warning message
+			JOptionPane.showMessageDialog(null,"Database error. Cannot edit player","Error",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				//Close statement
+				update.close();
+			}catch(SQLException e){}
+			try{
+				//Close connection
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
 	/** Reset password method
 	 * @throws InvalidKeySpecException 
 	 * @throws NoSuchAlgorithmException 
