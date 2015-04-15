@@ -57,6 +57,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -420,7 +422,7 @@ public class ClubReg {
 		lblChangePassword.setHorizontalAlignment(SwingConstants.CENTER);
 		lblChangePassword.setBounds(341, 329, 239, 16);
 		login.add(lblChangePassword);
-		
+
 		imageLoader = new JLabel("");
 		imageLoader.setIcon(new ImageIcon("C:\\Users\\DOK\\Downloads\\ajax-loader.gif"));
 		imageLoader.setBounds(417, 466, 100, 104);
@@ -585,7 +587,9 @@ public class ClubReg {
 		reception.add(pSurnameFieldRecep);
 		pSurnameFieldRecep.setColumns(10);
 
-		dateChooser = new JDateChooser();
+		//Set default date in date chooser
+		Date today =  new Date();
+		dateChooser = new JDateChooser(today, "TODAY");
 		dateChooser.setBounds(207, 349, 264, 22);
 		reception.add(dateChooser);
 
@@ -641,6 +645,8 @@ public class ClubReg {
 				try {
 					savePlayer();
 					clearRecepFields();
+					Date today =  new Date();
+					dateChooser.setDate(today);
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, "Cannot save player (actionPerformed)");
 					e1.printStackTrace();
@@ -786,7 +792,7 @@ public class ClubReg {
 		//select column_name from information_schema.columns where table_name='players'.... fill array with this info
 		//table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Job No");
 		//table.getColumnModel().getColumn(0).setPreferredWidth(55);
-		
+
 		//Set column widths and header values on table
 		table.getTableHeader().getColumnModel().getColumn(0).setHeaderValue("Player_ID");
 		table.getColumnModel().getColumn(0).setPreferredWidth(55);
@@ -820,7 +826,7 @@ public class ClubReg {
 		});
 		backManager.setBounds(309, 615, 97, 25);
 		manager.add(backManager);
-		
+
 		deletePlayer = new JButton("Delete");
 		deletePlayer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -834,7 +840,7 @@ public class ClubReg {
 					int numRows = table.getSelectedRows().length;
 					for(int i=0; i<numRows ; i++ ) {
 
-					    model.removeRow(table.getSelectedRow());
+						model.removeRow(table.getSelectedRow());
 					}
 				} catch (NumberFormatException e1) {
 					JOptionPane.showMessageDialog(null, "Cannot delete player (actionPerformed NFE)");
@@ -1125,7 +1131,7 @@ public class ClubReg {
 		});
 		btnResetUserPassword.setBounds(164, 514, 272, 25);
 		chairman.add(btnResetUserPassword);
-		
+
 		btnOfficials = new JButton("Officials");
 		btnOfficials.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1480,13 +1486,13 @@ public class ClubReg {
 		AllManagers.setBackground(Color.WHITE);
 		cards.add(AllManagers, ALL_MANAGERS);
 		AllManagers.setLayout(null);
-		
+
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBackground(Color.WHITE);
 		scrollPane_1.setBounds(83, 257, 814, 312);
 		scrollPane_1.getViewport().setBackground(Color.WHITE);
 		AllManagers.add(scrollPane_1);
-		
+
 		table_1 = new JTable(modelManagers)
 		{
 			/**
@@ -1507,23 +1513,23 @@ public class ClubReg {
 			table_1.getColumnModel().getColumn(k).setPreferredWidth(94);
 		}
 		scrollPane_1.setViewportView(table_1);
-		
+
 		JLabel label_3 = new JLabel("");
 		label_3.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
 		label_3.setHorizontalAlignment(SwingConstants.CENTER);
 		label_3.setBounds(75, 0, 814, 98);
 		AllManagers.add(label_3);
-		
+
 		JLabel lblManagers = new JLabel("Managers");
 		lblManagers.setHorizontalAlignment(SwingConstants.CENTER);
 		lblManagers.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblManagers.setBounds(75, 139, 814, 25);
 		AllManagers.add(lblManagers);
-		
+
 		JSeparator separator_1 = new JSeparator();
 		separator_1.setBounds(83, 201, 814, 2);
 		AllManagers.add(separator_1);
-		
+
 		JButton backManagers = new JButton("Back");
 		backManagers.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1533,7 +1539,7 @@ public class ClubReg {
 		});
 		backManagers.setBounds(357, 611, 97, 25);
 		AllManagers.add(backManagers);
-		
+
 		JButton btnDelete = new JButton("Delete");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1547,7 +1553,7 @@ public class ClubReg {
 					int numRows = table_1.getSelectedRows().length;
 					for(int i=0; i<numRows ; i++ ) {
 
-					    modelManagers.removeRow(table_1.getSelectedRow());
+						modelManagers.removeRow(table_1.getSelectedRow());
 					}
 				} catch (NumberFormatException e1) {
 					JOptionPane.showMessageDialog(null, "Cannot delete manager (actionPerformed NFE)");
@@ -1563,29 +1569,29 @@ public class ClubReg {
 		});
 		btnDelete.setBounds(487, 611, 97, 25);
 		AllManagers.add(btnDelete);
-		
+
 		//All Officials screen layout
 		JPanel allOfficials = new JPanel();
 		allOfficials.setBackground(Color.WHITE);
 		cards.add(allOfficials, ALL_OFFICIALS);
 		allOfficials.setLayout(null);
-		
+
 		label_4 = new JLabel("");
 		label_4.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
 		label_4.setHorizontalAlignment(SwingConstants.CENTER);
 		label_4.setBounds(75, 0, 814, 98);
 		allOfficials.add(label_4);
-		
+
 		lblOfficials = new JLabel("Officials");
 		lblOfficials.setHorizontalAlignment(SwingConstants.CENTER);
 		lblOfficials.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblOfficials.setBounds(66, 139, 814, 25);
 		allOfficials.add(lblOfficials);
-		
+
 		separator_2 = new JSeparator();
 		separator_2.setBounds(74, 201, 814, 2);
 		allOfficials.add(separator_2);
-		
+
 		scrollPane_2 = new JScrollPane();
 		scrollPane_2.setBackground(Color.WHITE);
 		scrollPane_2.getViewport().setBackground(Color.WHITE);
@@ -1612,7 +1618,7 @@ public class ClubReg {
 			table_2.getColumnModel().getColumn(k).setPreferredWidth(94);
 		}
 		scrollPane_2.setViewportView(table_2);
-		
+
 		button = new JButton("Back");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1627,23 +1633,23 @@ public class ClubReg {
 		allTeams.setBackground(Color.WHITE);
 		cards.add(allTeams, ALL_TEAMS);
 		allTeams.setLayout(null);
-		
+
 		label_5 = new JLabel("");
 		label_5.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
 		label_5.setHorizontalAlignment(SwingConstants.CENTER);
 		label_5.setBounds(75, 0, 814, 98);
 		allTeams.add(label_5);
-		
+
 		lblTeams = new JLabel("Teams");
 		lblTeams.setHorizontalAlignment(SwingConstants.CENTER);
 		lblTeams.setFont(new Font("Tahoma", Font.BOLD, 15));
 		lblTeams.setBounds(75, 139, 814, 25);
 		allTeams.add(lblTeams);
-		
+
 		separator_3 = new JSeparator();
 		separator_3.setBounds(83, 201, 814, 2);
 		allTeams.add(separator_3);
-		
+
 		scrollPane_3 = new JScrollPane();
 		scrollPane_3.getViewport().setBackground(Color.WHITE);
 		scrollPane_3.setBounds(83, 257, 814, 312);
@@ -1668,7 +1674,7 @@ public class ClubReg {
 			table_3.getColumnModel().getColumn(k).setPreferredWidth(94);
 		}
 		scrollPane_3.setViewportView(table_3);
-		
+
 		button_1 = new JButton("Back");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1678,7 +1684,7 @@ public class ClubReg {
 		});
 		button_1.setBounds(361, 618, 97, 25);
 		allTeams.add(button_1);
-		
+
 		JButton deleteTeam = new JButton("Delete");
 		deleteTeam.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1692,7 +1698,7 @@ public class ClubReg {
 					int numRows = table_3.getSelectedRows().length;
 					for(int i=0; i<numRows ; i++ ) {
 
-					    modelTeams.removeRow(table_3.getSelectedRow());
+						modelTeams.removeRow(table_3.getSelectedRow());
 					}
 				} catch (NumberFormatException e1) {
 					JOptionPane.showMessageDialog(null, "Cannot delete team (actionPerformed NFE)");
@@ -1708,7 +1714,7 @@ public class ClubReg {
 		});
 		deleteTeam.setBounds(490, 618, 97, 25);
 		allTeams.add(deleteTeam);
-		
+
 		JLabel lblWarningTeam = new JLabel("Please delete any manager or player associated with a team befor attempting to delete the team ");
 		lblWarningTeam.setFont(new Font("Tahoma", Font.BOLD, 13));
 		lblWarningTeam.setHorizontalAlignment(SwingConstants.CENTER);
@@ -1761,35 +1767,41 @@ public class ClubReg {
 		}else{
 			parentSurname = pFNameFieldRecep.getText().trim();
 		}
-		try {
-			//Initialize Connection and statements
-			//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");//s564387_dbaccess granted priv in phpmyadmin
-			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
-			insert = con.createStatement();
-			update = con.createStatement();
-			//Execute SQL statement
-			update.executeUpdate("INSERT INTO `s564387_clubreg`.`players` (`firstName`, `surname`, `status`, `houseNumber`, `dob`, `street`, `email`,"
-					+ " `townCity`, `phoneNumber`, `county`, `lastClub`, `lastLeague`, `parentFirstName`, `parentSurname`, `dateOfReg`, `feesPaid`,"
-					+ " `yellowCards`, `redCards`, `trainingAttended`, `goals`, `cleanSheets`, `imagePath`, `Team_ID`)"
-					+ " VALUES (('"+AES.encrypt(fNameFieldRecep.getText().trim())+"'), ('"+AES.encrypt(sNameFieldRecep.getText().trim())+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText().trim()+"'),"
-					+ " ('"+pDOBFieldRecep.getText().trim()+"'), ('"+pStreetFieldRecep.getText().trim()+"'), ('"+AES.encrypt(PEmailFieldRecep.getText().trim())+"'), ('"+pTownCityFieldRecep.getText().trim()+"'), ('"+pContactFieldRecep.getText().trim()+"'),"
-					+ " ('"+pCountyRecepField.getText().trim()+"'), ('"+pLastClubRecepField.getText().trim()+"'), ('"+pLastLeagueFieldrecep.getText().trim()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText().trim()+"'),('"+teamID+"'));");
+		if (!teamBox.getSelectedItem().toString().equalsIgnoreCase("Team")){
+			try {
+				//Initialize Connection and statements
+				//con = DriverManager.getConnection("jdbc:mysql://localhost:3306/clubreg", "root", "root");//s564387_dbaccess granted priv in phpmyadmin
+				con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+				insert = con.createStatement();
+				update = con.createStatement();
+				//Execute SQL statement
+				update.executeUpdate("INSERT INTO `s564387_clubreg`.`players` (`firstName`, `surname`, `status`, `houseNumber`, `dob`, `street`, `email`,"
+						+ " `townCity`, `phoneNumber`, `county`, `lastClub`, `lastLeague`, `parentFirstName`, `parentSurname`, `dateOfReg`, `feesPaid`,"
+						+ " `yellowCards`, `redCards`, `trainingAttended`, `goals`, `cleanSheets`, `imagePath`, `Team_ID`)"
+						+ " VALUES (('"+AES.encrypt(fNameFieldRecep.getText().trim())+"'), ('"+AES.encrypt(sNameFieldRecep.getText().trim())+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText().trim()+"'),"
+						+ " ('"+pDOBFieldRecep.getText().trim()+"'), ('"+pStreetFieldRecep.getText().trim()+"'), ('"+AES.encrypt(PEmailFieldRecep.getText().trim())+"'), ('"+pTownCityFieldRecep.getText().trim()+"'), ('"+pContactFieldRecep.getText().trim()+"'),"
+						+ " ('"+pCountyRecepField.getText().trim()+"'), ('"+pLastClubRecepField.getText().trim()+"'), ('"+pLastLeagueFieldrecep.getText().trim()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText().trim()+"'),('"+teamID+"'));");
 
-		} catch (SQLException e) {
-			//Show warning message
-			JOptionPane.showMessageDialog(null,"Database unavailable. Cannot save player","Error",2);
-			e.printStackTrace();
+			} catch (SQLException e) {
+				//Show warning message
+				JOptionPane.showMessageDialog(null,"Database unavailable. Cannot save player","Error",2);
+				e.printStackTrace();
+			}
+			finally{
+				try{
+					//Close statement
+					insert.close();
+				}catch(SQLException e){}
+				try{
+					//Close connection
+					con.close();
+				}catch(SQLException e){}
+			}
 		}
-		finally{
-			try{
-				//Close statement
-				insert.close();
-			}catch(SQLException e){}
-			try{
-				//Close connection
-				con.close();
-			}catch(SQLException e){}
+		else{
+			JOptionPane.showMessageDialog(null,"You must select a team","Error",2);
 		}
+
 	}
 	/**
 	 * Method to fill hashmap with all teams in database
@@ -2332,6 +2344,8 @@ public class ClubReg {
 					newManagerUsername.setText("");
 					newManagerPassword.setText("");
 					newManagerTeamName.setText("");
+					//Reload managers
+					fillManagers();
 					JOptionPane.showMessageDialog(null,"Manager added!","Success",2);
 				}
 			}
@@ -2374,12 +2388,12 @@ public class ClubReg {
 			insert = con.createStatement();
 			delete = con.createStatement();
 			String typeID = position + "_ID";
-					String sql = "DELETE FROM `"+tableName+"` WHERE `"+typeID+"` = '"+id+"'";
-					//Execute SQL statement
-					delete.executeUpdate(sql);
-					
-					JOptionPane.showMessageDialog(null,position + " deleted!","Success",2);
-				
+			String sql = "DELETE FROM `"+tableName+"` WHERE `"+typeID+"` = '"+id+"'";
+			//Execute SQL statement
+			delete.executeUpdate(sql);
+
+			JOptionPane.showMessageDialog(null,position + " deleted!","Success",2);
+
 		} catch (SQLException e) {
 			//Show warning message
 			JOptionPane.showMessageDialog(null,"Database error. Delete managers and players before team","Error",2);
@@ -2431,7 +2445,8 @@ public class ClubReg {
 					addOfficialUsernameField.setText("");
 					addOfficialPasswordField.setText("");
 					addOfficialPositionBox.setSelectedIndex(0);
-
+					//Reload officials
+					fillOfficials();
 					JOptionPane.showMessageDialog(null,position + " added!","Success",2);
 				}
 				else{
