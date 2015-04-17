@@ -20,8 +20,11 @@ import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Toolkit;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
@@ -89,6 +92,7 @@ public class ClubReg {
 	String [] columnNamesManagers = {"Manager ID", "First name", "Surname", "Team"};
 	String [] columnNamesOfficials = {"Official ID", "First name", "Surname", "Position"};
 	String [] columnNamesTeams = {"Team ID", "Team name"};
+	String [] columnNamesFinance = {"Player ID", "First name", "Surname", "Due", "Paid", "Outstanding"};
 	//Create frame to hold cards
 	private JFrame frmClubreg;
 	//Cards
@@ -159,7 +163,8 @@ public class ClubReg {
 	final private String ALL_MANAGERS = "All managers panel";
 	final private String ALL_OFFICIALS = "All officials panel";
 	final private String ALL_TEAMS = "All teams panel";
-	final private String EDIT_PLAYER = "Edit player panel panel";
+	final private String EDIT_PLAYER = "Edit player panel";
+	final private String FINANCE = "Finance panel";
 	private JLabel lblAllPlayers;
 	//Create team
 	private JPanel createTeam;
@@ -191,6 +196,7 @@ public class ClubReg {
 	final DefaultTableModel modelManagers = new DefaultTableModel(managers.size(),columnNamesManagers.length);
 	final DefaultTableModel modelOfficials = new DefaultTableModel(officials.size(),columnNamesOfficials.length);
 	final DefaultTableModel modelTeams = new DefaultTableModel(teamAndId.size(),columnNamesTeams.length);
+	final DefaultTableModel modelFinance = new DefaultTableModel(players.size(),columnNamesFinance.length);
 	//Hold the managers team ID
 	private String managerTeamID;
 	private boolean found = false;
@@ -270,6 +276,13 @@ public class ClubReg {
 	private JButton btnSave;
 	private JButton btnBack_1;
 	private JTextField playerIdEditPlayerField;
+	//Treasurer panel
+	private JPanel treasurer;
+	private JTable table_4;
+	private JLabel lblTotalPaid;
+	private JTextField totalPaidField;
+	private JTextField totalOutstandingField;
+	private JButton btnBack_2;
 
 	/**
 	 * Launch the application.
@@ -335,10 +348,14 @@ public class ClubReg {
 	 */
 	private void initialize() {
 		frmClubreg = new JFrame();
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		frmClubreg.getContentPane().setBackground(Color.WHITE);
 		frmClubreg.setTitle("ClubReg");
-		frmClubreg.setBounds(100, 100, 1063, 880);
+		frmClubreg.setBounds(100, 100, 1063, dim.height);
 		frmClubreg.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmClubreg.setExtendedState(Frame.MAXIMIZED_BOTH); 
+		frmClubreg.setLocation(dim.width/2-frmClubreg.getSize().width/2, dim.height/2-frmClubreg.getSize().height/2);
+
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{24, 950, 13, 0};
 		gridBagLayout.rowHeights = new int[]{43, 627, 31, 0};
@@ -665,6 +682,7 @@ public class ClubReg {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					savePlayer();
+					teamBox.setSelectedIndex(0);
 					clearRecepFields();
 					Date today =  new Date();
 					dateChooser.setDate(today);
@@ -841,7 +859,7 @@ public class ClubReg {
 						trainingEditPlayerField.setText(table.getValueAt(rowSelected,7).toString());
 						goalsEditPlayerField.setText(table.getValueAt(rowSelected, 8).toString());
 						cleanSheetsEditPlayerField.setText(table.getValueAt(rowSelected, 9).toString());
-						
+
 					}
 				}
 			}
@@ -1153,7 +1171,7 @@ public class ClubReg {
 		btnCreateManager.setBounds(526, 385, 272, 25);
 		chairman.add(btnCreateManager);
 
-		JButton btnAddOfficial = new JButton("Add official");
+		JButton btnAddOfficial = new JButton("Create official");
 		btnAddOfficial.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout)(cards.getLayout());
@@ -1533,7 +1551,7 @@ public class ClubReg {
 		scrollPane_1.setBounds(83, 257, 814, 312);
 		scrollPane_1.getViewport().setBackground(Color.WHITE);
 		AllManagers.add(scrollPane_1);
-		
+
 		table_1 = new JTable(modelManagers)
 		{
 			/**
@@ -1573,7 +1591,7 @@ public class ClubReg {
 		separator_1.setBounds(83, 201, 814, 2);
 		AllManagers.add(separator_1);
 
-		JButton backManagers = new JButton("Back");
+		/*JButton backManagers = new JButton("Back");
 		backManagers.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout)(cards.getLayout());
@@ -1581,7 +1599,7 @@ public class ClubReg {
 			}
 		});
 		backManagers.setBounds(357, 611, 97, 25);
-		AllManagers.add(backManagers);
+		AllManagers.add(backManagers);*/
 
 		JButton btnDelete = new JButton("Delete");
 		btnDelete.addActionListener(new ActionListener() {
@@ -1612,6 +1630,16 @@ public class ClubReg {
 		});
 		btnDelete.setBounds(487, 611, 97, 25);
 		AllManagers.add(btnDelete);
+		
+		btnBack_2 = new JButton("Back");
+		btnBack_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) (cards.getLayout());
+				cl.show(cards, CHAIRMAN);
+			}
+		});
+		btnBack_2.setBounds(378, 611, 97, 25);
+		AllManagers.add(btnBack_2);
 
 		//All Officials screen layout
 		JPanel allOfficials = new JPanel();
@@ -1762,107 +1790,107 @@ public class ClubReg {
 		deleteTeam.setBounds(490, 618, 97, 25);
 		allTeams.add(deleteTeam);
 
-		JLabel lblWarningTeam = new JLabel("Please delete any manager or player associated with a team befor attempting to delete the team ");
+		JLabel lblWarningTeam = new JLabel("Please delete any manager or player associated with a team before attempting to delete the team ");
 		lblWarningTeam.setFont(new Font("Tahoma", Font.BOLD, 13));
 		lblWarningTeam.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWarningTeam.setBounds(93, 217, 796, 16);
 		allTeams.add(lblWarningTeam);
-		
+
 		managerEdit = new JPanel();
 		managerEdit.setBackground(Color.WHITE);
 		cards.add(managerEdit, EDIT_PLAYER);
 		managerEdit.setLayout(null);
-		
+
 		JLabel label_6 = new JLabel("");
 		label_6.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
 		label_6.setHorizontalAlignment(SwingConstants.CENTER);
 		label_6.setBounds(75, 0, 814, 98);
 		managerEdit.add(label_6);
-		
+
 		JLabel editPlayer = new JLabel("Edit Player");
 		editPlayer.setHorizontalAlignment(SwingConstants.CENTER);
 		editPlayer.setFont(new Font("Tahoma", Font.BOLD, 15));
 		editPlayer.setBounds(75, 125, 791, 16);
 		managerEdit.add(editPlayer);
-		
+
 		JButton button_2 = new JButton("Logout");
 		button_2.setBounds(428, 632, 97, 25);
 		managerEdit.add(button_2);
-		
+
 		JLabel lblName_1 = new JLabel("Name");
 		lblName_1.setBounds(178, 207, 82, 16);
 		managerEdit.add(lblName_1);
-		
+
 		nameEditPlayerField = new JTextField();
 		nameEditPlayerField.setEditable(false);
 		nameEditPlayerField.setBounds(272, 204, 200, 22);
 		managerEdit.add(nameEditPlayerField);
 		nameEditPlayerField.setColumns(10);
-		
+
 		JLabel lblSurname_2 = new JLabel("Surname");
 		lblSurname_2.setBounds(503, 207, 70, 16);
 		managerEdit.add(lblSurname_2);
-		
+
 		surnameEditPlayerField = new JTextField();
 		surnameEditPlayerField.setEditable(false);
 		surnameEditPlayerField.setBounds(578, 204, 200, 22);
 		managerEdit.add(surnameEditPlayerField);
 		surnameEditPlayerField.setColumns(10);
-		
+
 		JLabel lblFeesPaid = new JLabel("Fees paid");
 		lblFeesPaid.setBounds(503, 307, 70, 16);
 		managerEdit.add(lblFeesPaid);
-		
+
 		feesEditPlayerField = new JTextField();
 		feesEditPlayerField.setBounds(578, 304, 200, 22);
 		managerEdit.add(feesEditPlayerField);
 		feesEditPlayerField.setColumns(10);
-		
+
 		JLabel lblYellowCards = new JLabel("Yellow cards");
 		lblYellowCards.setBounds(178, 310, 82, 16);
 		managerEdit.add(lblYellowCards);
-		
+
 		yellowsEditPlayerField = new JTextField();
 		yellowsEditPlayerField.setBounds(272, 307, 200, 22);
 		managerEdit.add(yellowsEditPlayerField);
 		yellowsEditPlayerField.setColumns(10);
-		
+
 		lblRedCards = new JLabel("Red cards");
 		lblRedCards.setBounds(501, 358, 65, 16);
 		managerEdit.add(lblRedCards);
-		
+
 		redsEditPlayerField = new JTextField();
 		redsEditPlayerField.setBounds(578, 355, 200, 22);
 		managerEdit.add(redsEditPlayerField);
 		redsEditPlayerField.setColumns(10);
-		
+
 		lblTraining = new JLabel("Training");
 		lblTraining.setBounds(503, 256, 58, 16);
 		managerEdit.add(lblTraining);
-		
+
 		trainingEditPlayerField = new JTextField();
 		trainingEditPlayerField.setBounds(578, 253, 200, 22);
 		managerEdit.add(trainingEditPlayerField);
 		trainingEditPlayerField.setColumns(10);
-		
+
 		lblGoals = new JLabel("Goals");
 		lblGoals.setBounds(178, 256, 56, 16);
 		managerEdit.add(lblGoals);
-		
+
 		goalsEditPlayerField = new JTextField();
 		goalsEditPlayerField.setBounds(272, 253, 200, 22);
 		managerEdit.add(goalsEditPlayerField);
 		goalsEditPlayerField.setColumns(10);
-		
+
 		cleanSheetsEditPlayerField = new JTextField();
 		cleanSheetsEditPlayerField.setBounds(272, 355, 200, 22);
 		managerEdit.add(cleanSheetsEditPlayerField);
 		cleanSheetsEditPlayerField.setColumns(10);
-		
+
 		lblCleanSheets = new JLabel("Clean sheets");
 		lblCleanSheets.setBounds(178, 358, 74, 16);
 		managerEdit.add(lblCleanSheets);
-		
+
 		btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1879,7 +1907,7 @@ public class ClubReg {
 		});
 		btnSave.setBounds(508, 435, 97, 25);
 		managerEdit.add(btnSave);
-		
+
 		btnBack_1 = new JButton("Back");
 		btnBack_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1889,16 +1917,94 @@ public class ClubReg {
 		});
 		btnBack_1.setBounds(396, 435, 97, 25);
 		managerEdit.add(btnBack_1);
-		
+
 		playerIdEditPlayerField = new JTextField();
 		playerIdEditPlayerField.setEditable(false);
 		playerIdEditPlayerField.setBounds(489, 169, 116, 22);
 		managerEdit.add(playerIdEditPlayerField);
 		playerIdEditPlayerField.setColumns(10);
-		
+
 		JLabel lblPlayerId = new JLabel("Player ID");
 		lblPlayerId.setBounds(381, 169, 91, 22);
 		managerEdit.add(lblPlayerId);
+
+		treasurer = new JPanel();
+		treasurer.setBackground(Color.WHITE);
+		cards.add(treasurer, FINANCE);
+		treasurer.setLayout(null);
+
+		JLabel label_7 = new JLabel("");
+		label_7.setIcon(new ImageIcon(ClubReg.class.getResource("/images/clubReg2.png")));
+		label_7.setHorizontalAlignment(SwingConstants.CENTER);
+		label_7.setBounds(75, 0, 814, 98);
+		treasurer.add(label_7);
+
+		JLabel lblFinancial = new JLabel("Financial");
+		lblFinancial.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFinancial.setFont(new Font("Tahoma", Font.BOLD, 15));
+		lblFinancial.setBounds(69, 125, 791, 16);
+		treasurer.add(lblFinancial);
+
+		JButton button_3 = new JButton("Logout");
+		button_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CardLayout cl = (CardLayout) (cards.getLayout());
+				cl.show(cards, LOGIN);
+			}
+		});
+		button_3.setBounds(422, 632, 97, 25);
+		treasurer.add(button_3);
+
+		JScrollPane scrollPane_4 = new JScrollPane();
+		scrollPane_4.setBackground(Color.WHITE);
+		scrollPane_4.setBounds(75, 249, 814, 312);
+		treasurer.add(scrollPane_4);
+		//Set up table for teams
+		table_4 = new JTable(modelFinance)
+		{
+			/**
+			 * Set up table model
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public boolean isCellEditable(int data, int columns)
+			{
+				return false;
+			}
+		};
+		table_4.setRowHeight(25);
+		//Only allow single row selection
+		table_4.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		for (int k = 0; k < columnNamesFinance.length; k++)
+		{
+			table_4.getTableHeader().getColumnModel().getColumn(k).setHeaderValue(columnNamesFinance[k]);
+			table_4.getColumnModel().getColumn(k).setPreferredWidth(94);
+		}
+		scrollPane_4.setViewportView(table_4);
+
+		JSeparator separator_4 = new JSeparator();
+		separator_4.setBounds(75, 193, 814, 2);
+		treasurer.add(separator_4);
+		
+		lblTotalPaid = new JLabel("Total paid");
+		lblTotalPaid.setBounds(231, 590, 72, 16);
+		treasurer.add(lblTotalPaid);
+		
+		totalPaidField = new JTextField();
+		totalPaidField.setEditable(false);
+		totalPaidField.setBounds(321, 587, 116, 22);
+		treasurer.add(totalPaidField);
+		totalPaidField.setColumns(10);
+		
+		JLabel lblTotalOutstanding = new JLabel("Total outstanding");
+		lblTotalOutstanding.setBounds(488, 590, 116, 16);
+		treasurer.add(lblTotalOutstanding);
+		
+		totalOutstandingField = new JTextField();
+		totalOutstandingField.setEditable(false);
+		totalOutstandingField.setBounds(620, 587, 116, 22);
+		treasurer.add(totalOutstandingField);
+		totalOutstandingField.setColumns(10);
 
 		//Copyright Label (Shown on all screens)
 		JLabel copyrightLabel = new JLabel("Copyright \u00A9 Derek O Keeffe 2014");
@@ -2143,10 +2249,10 @@ public class ClubReg {
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
 			if (!isChair){
-				selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players` WHERE `team_ID` = ('"+id+"') ORDER by `firstName`");
+				selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players` WHERE `team_ID` = ('"+id+"') ORDER by `Player_ID`");
 			}
 			else{
-				selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players` ORDER by `team_ID`");
+				selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players` ORDER by `Player_ID`");
 			}
 			result = selectStatement.executeQuery();
 			int i = 0;
@@ -2183,7 +2289,7 @@ public class ClubReg {
 		ResultSet result = null;
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
-			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `manager` ORDER by `Name`");
+			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `manager` ORDER by `Manager_ID`");
 			result = selectStatement.executeQuery();
 			int i = 0;
 			while (result.next()){
@@ -2218,7 +2324,7 @@ public class ClubReg {
 		ResultSet result = null;
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
-			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `officials` ORDER by `Name`");
+			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `officials` ORDER by `Official_ID`");
 			result = selectStatement.executeQuery();
 			int i = 0;
 			while (result.next()){
@@ -2305,6 +2411,7 @@ public class ClubReg {
 							addOfficialsToTable();
 							addPlayersToTable(0);
 							addManagersToTable();
+							addPlayersToFinanceTable();
 						} catch (Exception e) {
 							JOptionPane.showMessageDialog(null, "Cannot add players/managers/officials to table officialLogin");
 							e.printStackTrace();
@@ -2319,6 +2426,10 @@ public class ClubReg {
 					case "Secretary":
 						CardLayout cl1 = (CardLayout)(cards.getLayout());
 						cl1.show(cards, RECEP);
+						break;
+					case "Treasurer":
+						CardLayout cl2 = (CardLayout) (cards.getLayout());
+						cl2.show(cards, FINANCE);
 						break;
 					default:
 						break;
@@ -2361,7 +2472,7 @@ public class ClubReg {
 					}
 				}
 				else{
-					//put in counter after managers and officials to see if there all looped through
+					//maybe put in counter after managers and officials to see if there all looped through
 				}
 			}
 		}
@@ -2397,6 +2508,7 @@ public class ClubReg {
 				newManagerTeamIDBox.addItem("Team");
 				for (Entry<String, Integer> entry : teamAndId.entrySet())
 				{
+					teamBox.addItem(entry.getKey());
 					newManagerTeamIDBox.addItem(entry.getKey());
 				}
 				CardLayout cl = (CardLayout)(cards.getLayout());
@@ -2589,7 +2701,53 @@ public class ClubReg {
 			}catch(SQLException e){}
 		}
 	}
-	
+	/**
+	 * Adds all players to the finance table
+	 * @param id
+	 * @throws Exception 
+	 */
+	public void addPlayersToFinanceTable() throws Exception
+	{
+		modelFinance.setRowCount(0);
+		int totalPaid = 0;
+		int totalOutstanding = 0;
+		int clubFees = 130;
+		Connection con = null;
+		PreparedStatement selectStatement = null;
+		ResultSet result = null;
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
+
+			selectStatement = (PreparedStatement) con.prepareStatement("SELECT * FROM `players` ORDER by `Player_ID`");
+
+			result = selectStatement.executeQuery();
+			int i = 0;
+			while (result.next()){
+				int paid = Integer.parseInt(result.getString(17));
+				int outstanding = clubFees - paid;
+				totalPaid += paid;
+				totalOutstanding += outstanding;
+				modelFinance.insertRow(i,new Object[]{result.getString(1),AES.decrypt(result.getString(2)),(AES.decrypt(result.getString(3))),clubFees,(result.getString(17)),outstanding});
+				i ++;
+			}
+			totalPaidField.setText(""+totalPaid);
+			totalOutstandingField.setText(""+totalOutstanding);
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null,"Problem adding players to financeTable.","Missing info",2);
+			e.printStackTrace();
+		}
+		finally{
+			try{
+				result.close();
+			}catch(SQLException e){}
+			try{
+				selectStatement.close();
+			}catch(SQLException e){}
+			try{
+				con.close();
+			}catch(SQLException e){}
+		}
+	}
 	/**
 	 * Method to create official at the club
 	 * @throws Exception 
@@ -2790,7 +2948,7 @@ public class ClubReg {
 			int training = Integer.parseInt(trainingEditPlayerField.getText());
 			int goals = Integer.parseInt(goalsEditPlayerField.getText());
 			int cs = Integer.parseInt(cleanSheetsEditPlayerField.getText());
-			
+
 			con = DriverManager.getConnection("jdbc:mysql://clubreg.eu:3306/s564387_clubreg", "s564387", "farranpk53");
 			update = con.createStatement();
 			update.executeUpdate("UPDATE `players` SET `feesPaid`= ('"+fees+"'),`yellowCards`=('"+yellows+"'),`redCards`=('"+reds+"'),`yellowCards`=('"+yellows+"'),"
