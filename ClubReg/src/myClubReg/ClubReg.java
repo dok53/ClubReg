@@ -74,6 +74,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JSeparator;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.JScrollPane;
 import javax.swing.JPasswordField;
 
@@ -283,6 +284,8 @@ public class ClubReg {
 	private JTextField totalPaidField;
 	private JTextField totalOutstandingField;
 	private JButton btnBack_2;
+	//search table for name
+	private String searchFor = null;
 
 	/**
 	 * Launch the application.
@@ -803,6 +806,7 @@ public class ClubReg {
 						}
 					}
 				}
+				//playerFNameFieldManager.setText("");
 			}
 		});
 		searchBtnManager.setBounds(418, 204, 97, 25);
@@ -881,6 +885,7 @@ public class ClubReg {
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout)(cards.getLayout());
 				cl.show(cards, CHAIRMAN);
+				btnLogoutManager.setVisible(true);
 			}
 		});
 		backManager.setBounds(309, 615, 97, 25);
@@ -1028,7 +1033,7 @@ public class ClubReg {
 		managerDetailsLbl = new JLabel("Manager Details");
 		managerDetailsLbl.setFont(new Font("Tahoma", Font.BOLD, 15));
 		managerDetailsLbl.setHorizontalAlignment(SwingConstants.CENTER);
-		managerDetailsLbl.setBounds(75, 125, 814, 16);
+		managerDetailsLbl.setBounds(75, 125, 814, 22);
 		addManager.add(managerDetailsLbl);
 
 		newManagerTeamIDLbl = new JLabel("Team name/ID");
@@ -1107,6 +1112,7 @@ public class ClubReg {
 			public void actionPerformed(ActionEvent e) {
 				CardLayout cl = (CardLayout)(cards.getLayout());
 				cl.show(cards, MANAGER);
+				btnLogoutManager.setVisible(false);
 			}
 		});
 		btnPlayersChairman.setBounds(526, 262, 272, 25);
@@ -2411,7 +2417,6 @@ public class ClubReg {
 							addOfficialsToTable();
 							addPlayersToTable(0);
 							addManagersToTable();
-							addPlayersToFinanceTable();
 						} catch (Exception e) {
 							JOptionPane.showMessageDialog(null, "Cannot add players/managers/officials to table officialLogin");
 							e.printStackTrace();
@@ -2428,6 +2433,12 @@ public class ClubReg {
 						cl1.show(cards, RECEP);
 						break;
 					case "Treasurer":
+						try {
+							addPlayersToFinanceTable();
+						} catch (Exception e) {
+							JOptionPane.showMessageDialog(null, "Cannot add player to financeTable treasurerLogin");
+							e.printStackTrace();
+						}
 						CardLayout cl2 = (CardLayout) (cards.getLayout());
 						cl2.show(cards, FINANCE);
 						break;
@@ -2776,7 +2787,6 @@ public class ClubReg {
 					String sql = "INSERT INTO `s564387_clubreg`.`officials` (`Official_ID`, `Name`, `Surname`, `password`, `username`, `position`) "
 							+ "VALUES (NULL, ('"+AES.encrypt(name)+"'), ('"+AES.encrypt(surname)+"'), ('"+passHash+"'),('"+AES.encrypt(username)+"'), ('"+position+"'))";
 					//Execute SQL statement
-					System.out.println(sql);
 					update.executeUpdate(sql);
 					addOfficialNameField.setText("");
 					addOfficialSurnameField.setText("");
