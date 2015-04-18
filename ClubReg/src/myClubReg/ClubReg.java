@@ -323,8 +323,8 @@ public class ClubReg {
 		//Fill all managers on start up
 
 		//Encrypt and Decrypt data
-		//String password = "derek";
-		/*String passwordEnc = AES.encrypt(password);
+		/*String password = "Walsh";
+		String passwordEnc = AES.encrypt(password);
         String passwordDec = AES.decrypt(passwordEnc);
         System.out.println((passwordEnc + " " + passwordDec));*/
 
@@ -806,7 +806,7 @@ public class ClubReg {
 						}
 					}
 				}
-				//playerFNameFieldManager.setText("");
+				playerFNameFieldManager.setText("");
 			}
 		});
 		searchBtnManager.setBounds(418, 204, 97, 25);
@@ -1531,6 +1531,9 @@ public class ClubReg {
 				} catch (InvalidKeySpecException e1) {
 					JOptionPane.showMessageDialog(null, "Cannot reset password(Action performed)");
 					e1.printStackTrace();
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Cannot reset password(Action performed)");
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -2072,7 +2075,7 @@ public class ClubReg {
 						+ " VALUES (('"+AES.encrypt(fNameFieldRecep.getText().trim())+"'), ('"+AES.encrypt(sNameFieldRecep.getText().trim())+"'), ('"+pStatusBoxRecep.getSelectedItem()+"'), ('"+pHouseNoFieldRecep.getText().trim()+"'),"
 						+ " ('"+pDOBFieldRecep.getText().trim()+"'), ('"+pStreetFieldRecep.getText().trim()+"'), ('"+AES.encrypt(PEmailFieldRecep.getText().trim())+"'), ('"+pTownCityFieldRecep.getText().trim()+"'), ('"+pContactFieldRecep.getText().trim()+"'),"
 						+ " ('"+pCountyRecepField.getText().trim()+"'), ('"+pLastClubRecepField.getText().trim()+"'), ('"+pLastLeagueFieldrecep.getText().trim()+"'), ('"+parentName+"'), ('"+parentSurname+"'), ('"+formattedDate+"'), '0', '0', '0', '0', '0', '0', ('"+filePathFieldRecep.getText().trim()+"'),('"+teamID+"'));");
-
+				fillAllPlayers();
 			} catch (SQLException e) {
 				//Show warning message
 				JOptionPane.showMessageDialog(null,"Database unavailable. Cannot save player","Error",2);
@@ -2992,10 +2995,9 @@ public class ClubReg {
 		}
 	}
 	/** Reset password method
-	 * @throws InvalidKeySpecException 
-	 * @throws NoSuchAlgorithmException 
+	 * @throws Exception 
 	 */
-	public void resetPassword() throws NoSuchAlgorithmException, InvalidKeySpecException
+	public void resetPassword() throws Exception
 	{
 		//Initalize connection and statements
 		Connection con = null;
@@ -3011,8 +3013,8 @@ public class ClubReg {
 			String newPass = new String (resetPassPasswordField.getPassword());
 			String newPassHash = PasswordHash.createHash(newPass);
 			String type = comboBox.getSelectedItem().toString();
-			String name = resetPassNameField.getText();
-			String surname = resetPassSurnameField.getText();
+			String name = resetPassNameField.getText().trim();
+			String surname = resetPassSurnameField.getText().trim();
 			if (type.equalsIgnoreCase("Manager")){
 				for (int i = 0; i < managers.size(); i ++)
 				{
@@ -3023,6 +3025,7 @@ public class ClubReg {
 							resetPassNameField.setText("");
 							resetPassPasswordField.setText("");
 							resetPassSurnameField.setText("");
+							fillAllPlayers();
 							JOptionPane.showMessageDialog(null, "Password reset");
 						}
 					}
@@ -3038,6 +3041,7 @@ public class ClubReg {
 							resetPassNameField.setText("");
 							resetPassPasswordField.setText("");
 							resetPassSurnameField.setText("");
+							fillOfficials();
 							JOptionPane.showMessageDialog(null, "Password reset");
 						}
 					}
